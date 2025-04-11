@@ -1,9 +1,11 @@
 import 'package:e_health_front/screens/appointment/noteScreen.dart';
 import 'package:e_health_front/screens/appointment/ordonnanceScreen.dart';
 import 'package:e_health_front/screens/appointment/regimeScreen.dart';
+import 'package:e_health_front/screens/pdfViewerScreen.dart'; // Ensure this import is correct and the file exists
 import 'package:flutter/material.dart';
 import 'package:e_health_front/services/api_service.dart';
 
+//
 class HistoryAppointmentScreen extends StatefulWidget {
   final String doctorId;
 
@@ -367,8 +369,34 @@ class _HistoryAppointmentScreenState extends State<HistoryAppointmentScreen> {
                           Icons.download,
                           color: Colors.grey,
                         ),
+
                         onTap: () {
-                          // Ouvrir le PDF
+                          // Vérifier que doc['file'] existe et n'est pas vide
+                          if (doc['file'] != null &&
+                              doc['file'].toString().isNotEmpty) {
+                            debugPrint('URL du PDF: ${doc['file']}');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (_) => PdfViewerScreen(
+                                      url:
+                                          "https://res.cloudinary.com/dvrhrdvps/raw/upload/v1744410681/documents/fqq8fbaybah68gipwxtr",
+                                      title: doc['title'] ?? 'Document',
+                                    ),
+                              ),
+                            );
+                          } else {
+                            // Afficher un message d'erreur si l'URL est manquante
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Lien vers le PDF manquant ou invalide',
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
                         },
                       );
                     }).toList(),
@@ -452,7 +480,7 @@ class _HistoryAppointmentScreenState extends State<HistoryAppointmentScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: const [
                     Text(
-                      'Voir tout',
+                      'Voir plus',
                       style: TextStyle(
                         color: Color(0xFF4A6572),
                         fontWeight: FontWeight.w500,
@@ -490,7 +518,7 @@ class _HistoryAppointmentScreenState extends State<HistoryAppointmentScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            itemDescriptionBuilder(item),
+                            "${itemDescriptionBuilder(item).split(' ').take(5).join(' ')}...",
                             style: TextStyle(color: textColor),
                           ),
                         ),

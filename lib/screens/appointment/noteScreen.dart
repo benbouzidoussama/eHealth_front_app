@@ -58,13 +58,6 @@ class NoteScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                          Text(
-                            DateTime.now().toString().split(' ')[0],
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 14,
-                            ),
-                          ),
                         ],
                       ),
                     ),
@@ -76,8 +69,7 @@ class NoteScreen extends StatelessWidget {
                       itemCount: notes.length,
                       itemBuilder: (context, index) {
                         final note = notes[index];
-                        final color = _getCategoryColor(note['category']);
-                        return _buildNoteCard(note, index, color);
+                        return _buildNoteCard(note, index);
                       },
                     ),
                   ],
@@ -86,35 +78,10 @@ class NoteScreen extends StatelessWidget {
     );
   }
 
-  Color _getCategoryColor(String? category) {
-    if (category == null) return Colors.blue;
-
-    switch (category.toLowerCase()) {
-      case 'urgent':
-        return Colors.red;
-      case 'suivi':
-        return Colors.green;
-      case 'diagnostic':
-        return Colors.purple;
-      case 'traitement':
-        return Colors.orange;
-      case 'allergie':
-        return Colors.red;
-      default:
-        return Colors.blue;
-    }
-  }
-
-  Widget _buildNoteCard(
-    Map<String, dynamic> note,
-    int index,
-    Color categoryColor,
-  ) {
+  Widget _buildNoteCard(Map<String, dynamic> note, int index) {
     final titre = note['titre'] ?? 'Sans titre';
     final content = note['content'] ?? 'Pas de contenu';
-    final category = note['category'] ?? 'Général';
-    final date = note['date'] ?? DateTime.now().toString().split(' ')[0];
-
+    final date = note['createdAt'].toString().split('T')[0];
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -135,7 +102,7 @@ class NoteScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: categoryColor.withOpacity(0.1),
+              color: Colors.blue.withOpacity(0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -149,13 +116,13 @@ class NoteScreen extends StatelessWidget {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: categoryColor.withOpacity(0.3),
+                      color: Colors.blue.withOpacity(0.3),
                       width: 1,
                     ),
                   ),
                   child: Icon(
                     Icons.sticky_note_2_outlined,
-                    color: categoryColor,
+                    color: Colors.blue,
                     size: 24,
                   ),
                 ),
@@ -175,25 +142,6 @@ class NoteScreen extends StatelessWidget {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: categoryColor.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              category,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: categoryColor,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
                           Icon(
                             Icons.calendar_today,
                             size: 12,
@@ -226,45 +174,6 @@ class NoteScreen extends StatelessWidget {
                 color: Colors.black87,
                 height: 1.5,
               ),
-            ),
-          ),
-
-          // Actions footer
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton.icon(
-                  icon: const Icon(Icons.copy_outlined, size: 16),
-                  label: const Text('Copier'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.grey[700],
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                  ),
-                  onPressed: () {
-                    // Fonctionnalité de copie
-                  },
-                ),
-                const SizedBox(width: 8),
-                TextButton.icon(
-                  icon: const Icon(Icons.share_outlined, size: 16),
-                  label: const Text('Partager'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: const Color(0xFF4A6572),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                  ),
-                  onPressed: () {
-                    // Fonctionnalité de partage
-                  },
-                ),
-              ],
             ),
           ),
         ],

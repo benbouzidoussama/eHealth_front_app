@@ -24,20 +24,6 @@ class OrdonnanceScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF4A6572)),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.print, color: Color(0xFF4A6572)),
-            onPressed: () {
-              // Fonctionnalité d'impression
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Impression des ordonnances en cours...'),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-          ),
-        ],
       ),
       backgroundColor: const Color(0xFFF5F7FA),
       body:
@@ -47,44 +33,6 @@ class OrdonnanceScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    // Header info card
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.purple.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.purple.withOpacity(0.2),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.info_outline, color: Colors.purple),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
-                                Text(
-                                  'Information',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.purple,
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  'Ces ordonnances doivent être présentées à votre pharmacien.',
-                                  style: TextStyle(color: Colors.purple),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
                     // Prescription count
                     Padding(
                       padding: const EdgeInsets.only(left: 4, bottom: 16),
@@ -121,29 +69,12 @@ class OrdonnanceScreen extends StatelessWidget {
                   ],
                 ),
               ),
-      floatingActionButton:
-          prescriptions.isNotEmpty
-              ? FloatingActionButton(
-                backgroundColor: const Color(0xFF4A6572),
-                child: const Icon(Icons.share),
-                onPressed: () {
-                  // Fonctionnalité de partage
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Partage des ordonnances...'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                },
-              )
-              : null,
     );
   }
 
   Widget _buildPrescriptionCard(Map<String, dynamic> prescription, int index) {
     final description = prescription['description'] ?? 'Sans description';
-    final dosage = prescription['dosage'] ?? 'Non spécifié';
-    final frequency = prescription['frequency'] ?? 'Non spécifié';
+
     final duration = prescription['duration'] ?? 'Non spécifié';
     final notes = prescription['notes'] ?? '';
 
@@ -200,24 +131,6 @@ class OrdonnanceScreen extends StatelessWidget {
                           color: Color(0xFF2E3C42),
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.schedule,
-                            size: 14,
-                            color: Colors.black54,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            duration,
-                            style: const TextStyle(
-                              color: Colors.black54,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
                     ],
                   ),
                 ),
@@ -249,26 +162,6 @@ class OrdonnanceScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                // Dosage and frequency row
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildInfoItem(
-                        'Dosage',
-                        dosage,
-                        Icons.local_drink_outlined,
-                      ),
-                    ),
-                    Expanded(
-                      child: _buildInfoItem(
-                        'Fréquence',
-                        frequency,
-                        Icons.access_time,
-                      ),
-                    ),
-                  ],
-                ),
 
                 // Notes if available
                 if (notes.isNotEmpty) ...[

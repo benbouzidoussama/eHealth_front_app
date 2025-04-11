@@ -47,6 +47,9 @@ dependencies:
   intl: ^0.18.1
   lottie: ^3.0.0
   image_picker: ^1.0.7
+  flutter_pdfview: ^1.2.7
+  path_provider: ^2.1.1
+  share_plus: ^6.0.1
 
 
 dev_dependencies:
