@@ -552,7 +552,6 @@ class ArticlesList extends StatelessWidget {
                             final doctorData = await apiService.fetchDoctorById(
                               articles[index]['idDoctor'],
                             );
-                            //print("doctorData: $doctorData");
                             Navigator.push(
                               context,
                               MaterialPageRoute(

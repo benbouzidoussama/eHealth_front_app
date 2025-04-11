@@ -46,7 +46,6 @@ class _LoginScreenState extends State<LoginScreen> {
       
       // Stocker les informations de l'utilisateur
       Provider.of<UserProvider>(context, listen: false).setUser(userData);
-      print(userData);
       // Stocker les articles
       if (articlesResponse != null) {
         Provider.of<ArticleProvider>(

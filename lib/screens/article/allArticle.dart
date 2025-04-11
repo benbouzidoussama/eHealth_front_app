@@ -17,46 +17,121 @@ class AllArticleScreen extends StatefulWidget {
 class _AllArticleScreenState extends State<AllArticleScreen> {
   int _currentPage = 0;
   final int _articlesPerPage = 5;
+  final TextEditingController _searchController = TextEditingController();
+  bool _isSearching = false;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final articleProvider = Provider.of<ArticleProvider>(context);
     final double screenWidth = MediaQuery.of(context).size.width;
     final articles = articleProvider.articles;
-    final int totalPages = (articles.length / _articlesPerPage).ceil();
+
+    // Filtrage des articles par recherche
+    final filteredArticles =
+        _isSearching
+            ? articles.where((article) {
+              return article['titre'].toLowerCase().contains(
+                    _searchController.text.toLowerCase(),
+                  ) ||
+                  article['description'].toLowerCase().contains(
+                    _searchController.text.toLowerCase(),
+                  );
+            }).toList()
+            : articles;
+
+    final int totalPages = (filteredArticles.length / _articlesPerPage).ceil();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF8F9FB),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 1,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF2E7D32), Color(0xFF81C784)],
+            ),
+          ),
+        ),
+        elevation: 0,
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_ios_new,
-            color: Colors.black,
+            color: Colors.white,
             size: 20,
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Articles',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
+        title:
+            _isSearching
+                ? TextField(
+                  controller: _searchController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    hintText: 'Rechercher un article...',
+                    hintStyle: TextStyle(color: Colors.white70),
+                    border: InputBorder.none,
+                  ),
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                )
+                : const Text(
+                  'Articles',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              _isSearching ? Icons.close : Icons.search,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              setState(() {
+                _isSearching = !_isSearching;
+                if (!_isSearching) {
+                  _searchController.clear();
+                }
+              });
+            },
           ),
-        ),
+        ],
         centerTitle: true,
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
         child:
-            articles.isEmpty
-                ? const Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Color(0xFF2E7D32),
-                    ),
+            filteredArticles.isEmpty
+                ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.article_outlined,
+                        size: 60,
+                        color: Color(0xFF2E7D32),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        articles.isEmpty
+                            ? "Chargement des articles..."
+                            : "Aucun article trouvé",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
                   ),
                 )
                 : Column(
@@ -67,95 +142,160 @@ class _AllArticleScreenState extends State<AllArticleScreen> {
                         physics: const BouncingScrollPhysics(),
                         itemCount:
                             (_currentPage + 1) * _articlesPerPage <=
-                                    articles.length
+                                    filteredArticles.length
                                 ? _articlesPerPage
-                                : articles.length % _articlesPerPage,
+                                : filteredArticles.length % _articlesPerPage ==
+                                    0
+                                ? _articlesPerPage
+                                : filteredArticles.length % _articlesPerPage,
                         itemBuilder: (context, index) {
                           final articleIndex =
                               _currentPage * _articlesPerPage + index;
-                          final article = articles[articleIndex];
-                          return ArticleCard(
-                            article: article,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => ArticleDetailScreen(
-                                        articleId: article['_id'],
-                                      ),
-                                ),
-                              );
-                            },
+                          if (articleIndex >= filteredArticles.length) {
+                            return null;
+                          }
+                          final article = filteredArticles[articleIndex];
+                          return AnimatedOpacity(
+                            opacity: 1.0,
+                            duration: Duration(
+                              milliseconds: 500 + (index * 100),
+                            ),
+                            child: ArticleCard(
+                              article: article,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => ArticleDetailScreen(
+                                          articleId: article['_id'],
+                                        ),
+                                  ),
+                                );
+                              },
+                            ),
                           );
                         },
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            icon: const Icon(
-                              Icons.chevron_left,
-                              size: 28,
-                              color: Colors.grey,
+
+                    // Pagination améliorée
+                    if (totalPages > 0)
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildPaginationButton(
+                              icon: Icons.first_page,
+                              onPressed:
+                                  _currentPage > 0
+                                      ? () => setState(() => _currentPage = 0)
+                                      : null,
                             ),
-                            onPressed:
-                                _currentPage > 0
-                                    ? () {
-                                      setState(() {
-                                        _currentPage--;
-                                      });
-                                    }
-                                    : null,
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 15,
-                              vertical: 5,
+                            _buildPaginationButton(
+                              icon: Icons.chevron_left,
+                              onPressed:
+                                  _currentPage > 0
+                                      ? () => setState(() => _currentPage--)
+                                      : null,
                             ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  spreadRadius: 1,
-                                  blurRadius: 3,
-                                  offset: const Offset(0, 1),
-                                ),
-                              ],
+                            for (int i = 0; i < totalPages; i++)
+                              if (i == _currentPage ||
+                                  i == 0 ||
+                                  i == totalPages - 1 ||
+                                  (i >= _currentPage - 1 &&
+                                      i <= _currentPage + 1))
+                                _buildPageNumber(i),
+                            _buildPaginationButton(
+                              icon: Icons.chevron_right,
+                              onPressed:
+                                  _currentPage < totalPages - 1
+                                      ? () => setState(() => _currentPage++)
+                                      : null,
                             ),
-                            child: Text(
-                              "${_currentPage + 1} / $totalPages",
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
+                            _buildPaginationButton(
+                              icon: Icons.last_page,
+                              onPressed:
+                                  _currentPage < totalPages - 1
+                                      ? () => setState(
+                                        () => _currentPage = totalPages - 1,
+                                      )
+                                      : null,
                             ),
-                          ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.chevron_right,
-                              size: 28,
-                              color: Colors.grey,
-                            ),
-                            onPressed:
-                                _currentPage < totalPages - 1
-                                    ? () {
-                                      setState(() {
-                                        _currentPage++;
-                                      });
-                                    }
-                                    : null,
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
                   ],
                 ),
+      ),
+    );
+  }
+
+  Widget _buildPaginationButton({
+    required IconData icon,
+    VoidCallback? onPressed,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.15),
+            spreadRadius: 1,
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: IconButton(
+        constraints: const BoxConstraints(minHeight: 36, minWidth: 36),
+        padding: EdgeInsets.zero,
+        icon: Icon(
+          icon,
+          size: 20,
+          color: onPressed != null ? const Color(0xFF2E7D32) : Colors.grey,
+        ),
+        onPressed: onPressed,
+      ),
+    );
+  }
+
+  Widget _buildPageNumber(int pageIndex) {
+    final isCurrentPage = pageIndex == _currentPage;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _currentPage = pageIndex;
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: isCurrentPage ? const Color(0xFF2E7D32) : Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.15),
+              spreadRadius: 1,
+              blurRadius: 2,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            "${pageIndex + 1}",
+            style: TextStyle(
+              color: isCurrentPage ? Colors.white : Colors.black87,
+              fontWeight: isCurrentPage ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -174,33 +314,114 @@ class ArticleCard extends StatelessWidget {
   const ArticleCard({Key? key, required this.article, required this.onTap})
     : super(key: key);
 
+  // Fonction pour obtenir une couleur en fonction de la catégorie
+  Color getCategoryColor(String category) {
+    switch (category.toLowerCase()) {
+      case 'santé':
+        return Colors.blue;
+      case 'nutrition':
+        return Colors.green;
+      case 'fitness':
+        return Colors.orange;
+      case 'bien-être':
+        return Colors.purple;
+      default:
+        return Colors.teal;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    return Card(
-      color: Colors.white,
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    final categoryColor = getCategoryColor(article['categorie']);
+
+    return Container(
       margin: EdgeInsets.symmetric(vertical: screenWidth * 0.02),
-      child: InkWell(
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
-        child: Padding(
-          padding: EdgeInsets.all(screenWidth * 0.04),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onTap,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: screenWidth * 0.06,
-                    backgroundColor: Colors.grey[200],
-                    backgroundImage: const AssetImage('images/profil.jpeg'),
+              // Image de couverture (placeholder)
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12),
+                ),
+                child: Container(
+                  height: 120,
+                  width: double.infinity,
+                  color: categoryColor.withOpacity(0.1),
+                  child: Stack(
+                    children: [
+                      Image(
+                        image: AssetImage('images/article.jpg'),
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      ),
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: categoryColor.withOpacity(0.8),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            article['categorie'],
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+              ),
+
+              // Contenu de l'article
+              Padding(
+                padding: EdgeInsets.all(screenWidth * 0.04),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      article['titre'],
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      article['description'],
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: Colors.grey[700], fontSize: 14),
+                    ),
+                    const SizedBox(height: 15),
+                    Row(
                       children: [
                         GestureDetector(
                           onTap: () async {
@@ -219,7 +440,7 @@ class ArticleCard extends StatelessWidget {
                               );
                             } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                   content: Text(
                                     'Erreur : Impossible de charger les données du docteur',
                                   ),
@@ -227,45 +448,49 @@ class ArticleCard extends StatelessWidget {
                               );
                             }
                           },
-                          child: Text(
-                            article['doctorName'],
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
-                            ),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: screenWidth * 0.04,
+                                backgroundColor: Colors.grey[200],
+                                backgroundImage: const AssetImage(
+                                  'images/profil.jpeg',
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                article['doctorName'],
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                  color: Color(0xFF2E7D32),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          article['categorie'],
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[600],
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            formatDate(article['createdAt']),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  Text(
-                    formatDate(article['createdAt']),
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              Text(
-                article['titre'],
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
+                  ],
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                article['description'],
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.grey[700], fontSize: 14),
               ),
             ],
           ),
@@ -273,4 +498,19 @@ class ArticleCard extends StatelessWidget {
       ),
     );
   }
+
+  // IconData _getCategoryIcon(String category) {
+  //   switch (category.toLowerCase()) {
+  //     case 'santé':
+  //       return Icons.medical_services;
+  //     case 'nutrition':
+  //       return Icons.restaurant_menu;
+  //     case 'fitness':
+  //       return Icons.fitness_center;
+  //     case 'bien-être':
+  //       return Icons.spa;
+  //     default:
+  //       return Icons.article;
+  //   }
+  // }
 }

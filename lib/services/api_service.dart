@@ -53,8 +53,11 @@ class ApiService {
         final doctorId = articles[i]['idDoctor'];
         if (doctorId != null) {
           final doctorResponse = await http.get(
-            Uri.parse('$baseUrl/doctors/$doctorId'),
-            headers: {"Content-Type": "application/json"},
+            Uri.parse('$baseUrl/doctors/${doctorId['_id']}'),
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer $token",
+            },
           );
           if (doctorResponse.statusCode == 200) {
             final doctorData = jsonDecode(doctorResponse.body);
@@ -78,7 +81,7 @@ class ApiService {
         headers: {"Content-Type": "application/json"},
       );
       final userData = jsonDecode(userResponse.body);
-      print("userData: $userData");
+
       return {
         "userData": userData,
         "loginResponse": jsonDecode(response.body),
@@ -187,7 +190,6 @@ class ApiService {
     return SharedPreferences.getInstance().then((prefs) {
       token = prefs.getString("token");
     });
-    //print("Token chargé depuis SharedPreferences: $token");
   }
 
   Future<List<String>> fetchAvailableSlots(String doctorId, String date) async {
@@ -299,7 +301,6 @@ class ApiService {
         }
       }
 
-      //print("myAppointments: $myAppointments");
       return myAppointments;
     } else {
       throw Exception('Failed to load my appointments');
@@ -316,7 +317,7 @@ class ApiService {
     confirmedAppointments.sort(
       (a, b) => DateTime.parse(a['date']).compareTo(DateTime.parse(b['date'])),
     );
-    print("confirmedAppointments: $confirmedAppointments");
+
     return confirmedAppointments;
   }
 
@@ -349,7 +350,9 @@ class ApiService {
     return canceledAppointments;
   }
 
-  Future<List<Map<String, dynamic>>> fetchCompletedAppointments(String iddoctor) async {
+  Future<List<Map<String, dynamic>>> fetchCompletedAppointments(
+    String iddoctor,
+  ) async {
     List<Map<String, dynamic>> myAppointments = await fetchMyAppointments();
     List<Map<String, dynamic>> completedAppointments =
         myAppointments
@@ -363,8 +366,69 @@ class ApiService {
     completedAppointments.sort(
       (a, b) => DateTime.parse(a['date']).compareTo(DateTime.parse(b['date'])),
     );
-    print("completedAppointments: $completedAppointments");
+
     return completedAppointments;
+  }
+
+  // Récupérer les détails d'un rendez-vous
+  Future<Map<String, dynamic>> getAppointmentDetails(
+    String appointmentId,
+  ) async {
+    final String url =
+        '$baseUrl/appointments/appointmentDetails/$appointmentId';
+    await loadToken(); // Charger le token
+
+    if (token == null) {
+      throw Exception("Token non défini");
+    }
+
+    final response = await http.get(
+      Uri.parse(url),
+      // headers: {
+      //   "Content-Type": "application/json",
+      //   "Authorization": "Bearer $token",
+      // },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body); // Retourne les détails du rendez-vous
+    } else {
+      throw Exception(
+        'Erreur lors de la récupération des détails du rendez-vous : ${response.body}',
+      );
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getAllAppointmentDetails(
+    String iddoctor,
+  ) async {
+    try {
+      // Étape 1 : récupérer tous les rendez-vous complétés du docteur
+      List<Map<String, dynamic>> completedAppointments =
+          await fetchCompletedAppointments(iddoctor);
+
+      // Étape 2 : pour chaque rendez-vous, récupérer les détails
+      List<Map<String, dynamic>> detailedAppointments = [];
+
+      for (var appointment in completedAppointments) {
+        try {
+          String appointmentId = appointment['_id'];
+          Map<String, dynamic> details = await getAppointmentDetails(
+            appointmentId,
+          );
+          detailedAppointments.add(details);
+        } catch (e) {
+          print(
+            "Erreur lors de la récupération des détails pour l'ID ${appointment['_id']}: $e",
+          );
+        }
+      }
+
+      return detailedAppointments;
+    } catch (e) {
+      ("Erreur dans getAllAppointmentDetails: $e");
+      rethrow;
+    }
   }
 
   Future<void> updateAppointmentStatus(
@@ -408,8 +472,6 @@ class ApiService {
         'Erreur lors du reprogrammation du rendez-vous : ${response.body}',
       );
     }
-
-    print("Rendez-vous reprogrammé avec succès");
   }
 
   Future<Map<String, dynamic>> updateProfile(
