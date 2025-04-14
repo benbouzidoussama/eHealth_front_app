@@ -1,5 +1,6 @@
 import 'package:e_health_front/screens/appointment/appointmentScreen.dart';
-import 'package:e_health_front/screens/chatScreen.dart';
+//import 'package:e_health_front/screens/chatScreen.dart';
+import 'package:e_health_front/screens/chat_list_screen.dart';
 import 'package:e_health_front/screens/home.dart';
 import 'package:e_health_front/screens/doctor/doctorScreen.dart';
 import 'package:e_health_front/screens/profil/profilScreen.dart';
@@ -28,7 +29,7 @@ class _NavigationState extends State<Navigation> {
     //   ],
     //   child: DoctorScreen(),
     // ),
-    ChatScreen(),
+    ChatListScreen(),
     AppointmentScreen(),
     ProfilScreen(),
   ];

@@ -5,8 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 
 class ApiService {
-  final String baseUrl = "http://10.0.2.2:3000/api";
-  //final String baseUrl = "http://localhost:3000/api";
+  //final String baseUrl = "http://10.0.2.2:3000/api";
+  final String baseUrl = "http://localhost:3000/api";
 
   String? token;
 
@@ -33,7 +33,7 @@ class ApiService {
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
       token = responseBody["accessToken"];
-      await loadToken(); // Charger le token avant d'utiliser JwtDecoder
+      //await loadToken(); // Charger le token avant d'utiliser JwtDecoder
       // Vérifier si le token est défini
       if (token == null) {
         throw Exception("Token non défini");
@@ -183,10 +183,10 @@ class ApiService {
 
   // Charger le token depuis SharedPreferences
   Future<void> loadToken() async {
-    if (token != null) {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString("token", token!);
-    }
+    // if (token != null) {
+    //   SharedPreferences prefs = await SharedPreferences.getInstance();
+    //   await prefs.setString("token", token!);
+    // }
     return SharedPreferences.getInstance().then((prefs) {
       token = prefs.getString("token");
     });

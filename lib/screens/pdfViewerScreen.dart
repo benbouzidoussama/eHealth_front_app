@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
+//import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart' as path;
+//import 'package:path/path.dart' as path;
 
 class PdfViewerScreen extends StatefulWidget {
   final String url;

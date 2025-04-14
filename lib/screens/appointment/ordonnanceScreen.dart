@@ -74,8 +74,6 @@ class OrdonnanceScreen extends StatelessWidget {
 
   Widget _buildPrescriptionCard(Map<String, dynamic> prescription, int index) {
     final description = prescription['description'] ?? 'Sans description';
-
-    final duration = prescription['duration'] ?? 'Non spécifié';
     final notes = prescription['notes'] ?? '';
 
     return Container(
@@ -211,43 +209,43 @@ class OrdonnanceScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoItem(String label, String value, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      margin: const EdgeInsets.only(right: 8),
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, size: 16, color: const Color(0xFF4A6572)),
-              const SizedBox(width: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: const TextStyle(
-              fontWeight: FontWeight.w500,
-              color: Colors.black87,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildInfoItem(String label, String value, IconData icon) {
+  //   return Container(
+  //     padding: const EdgeInsets.all(12),
+  //     margin: const EdgeInsets.only(right: 8),
+  //     decoration: BoxDecoration(
+  //       color: Colors.grey[100],
+  //       borderRadius: BorderRadius.circular(12),
+  //     ),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Row(
+  //           children: [
+  //             Icon(icon, size: 16, color: const Color(0xFF4A6572)),
+  //             const SizedBox(width: 4),
+  //             Text(
+  //               label,
+  //               style: TextStyle(
+  //                 fontSize: 12,
+  //                 color: Colors.grey[600],
+  //                 fontWeight: FontWeight.w500,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         const SizedBox(height: 4),
+  //         Text(
+  //           value,
+  //           style: const TextStyle(
+  //             fontWeight: FontWeight.w500,
+  //             color: Colors.black87,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildEmptyState() {
     return Center(
