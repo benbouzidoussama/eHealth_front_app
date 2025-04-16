@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../services/chat_service.dart';
+import 'dart:io'; // Add this import
+import 'package:image_picker/image_picker.dart'; // Need to add this package to pubspec.yaml
 
 class ChatDetailScreen extends StatefulWidget {
   final String chatId;
@@ -17,6 +19,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   late Future<List<dynamic>> _messagesFuture;
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final ImagePicker _imagePicker = ImagePicker(); // Initialize image picker
   String _currentUserId =
       "67c0500e8120019fe5ed3532"; // This should be dynamically set from your auth service
 
@@ -55,19 +58,151 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     }
   }
 
-  void _sendMessage() {
+  // Method to handle sending text messages
+  void _sendMessage() async {
     if (_messageController.text.trim().isNotEmpty) {
-      // Implement send message functionality
-      // ChatService().sendMessage(widget.chatId, _messageController.text, 'text');
+      final String message = _messageController.text;
       _messageController.clear();
-      // Refresh messages
-      setState(() {
-        _messagesFuture = ChatService().getMessages(widget.chatId);
-      });
-      // Scroll to bottom after sending
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollToBottom();
-      });
+      
+      // Get the token
+      final token = await ChatService().getToken();
+      
+      if (token == null) {
+        // Handle case where user is not authenticated
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('You need to be logged in to send messages')),
+        );
+        return;
+      }
+      
+      try {
+        // Send the message to the API
+        final response = await ChatService().sendTextMessage(
+          token: token,
+          chatId: widget.chatId,
+          content: message,
+        );
+        
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          // Message sent successfully, refresh the message list
+          setState(() {
+            _messagesFuture = ChatService().getMessages(widget.chatId);
+          });
+          
+          // Scroll to bottom after sending
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _scrollToBottom();
+          });
+        } else {
+          // Handle error response
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to send message: ${response.statusCode}')),
+          );
+        }
+      } catch (e) {
+        // Handle exceptions
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error sending message: $e')),
+        );
+      }
+    }
+  }
+
+  // New method to handle image picking from gallery
+  Future<void> _pickImageFromGallery() async {
+    try {
+      final XFile? pickedImage = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 70, // Reduce quality to save bandwidth
+      );
+      
+      if (pickedImage != null) {
+        await _sendImageMessage(File(pickedImage.path));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error picking image: $e')),
+      );
+    }
+  }
+
+  // New method to handle taking a photo with the camera
+  Future<void> _pickImageFromCamera() async {
+    try {
+      final XFile? takenImage = await _imagePicker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 70, // Reduce quality to save bandwidth
+      );
+      
+      if (takenImage != null) {
+        await _sendImageMessage(File(takenImage.path));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error taking photo: $e')),
+      );
+    }
+  }
+
+  // New method to send the image message using ChatService
+  Future<void> _sendImageMessage(File imageFile) async {
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+    
+    try {
+      // Get the token
+      final token = await ChatService().getToken();
+      
+      if (token == null) {
+        // Close loading dialog
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('You need to be logged in to send messages')),
+        );
+        return;
+      }
+      
+      // Send the image using ChatService
+      final response = await ChatService().sendImageMessage(
+        token: token,
+        chatId: widget.chatId,
+        imageFile: imageFile,
+      );
+      
+      // Close loading dialog
+      Navigator.pop(context);
+      
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Image sent successfully, refresh the message list
+        setState(() {
+          _messagesFuture = ChatService().getMessages(widget.chatId);
+        });
+        
+        // Scroll to bottom after sending
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _scrollToBottom();
+        });
+      } else {
+        // Handle error response
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to send image: ${response.statusCode}')),
+        );
+      }
+    } catch (e) {
+      // Close loading dialog
+      Navigator.pop(context);
+      // Handle exceptions
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error sending image: $e')),
+      );
     }
   }
 
@@ -449,7 +584,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                                       color: Colors.purple,
                                       onTap: () {
                                         Navigator.pop(context);
-                                        // Implement gallery picker
+                                        _pickImageFromGallery(); // Use our new method
                                       },
                                     ),
                                     _buildAttachmentOption(
@@ -458,7 +593,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                                       color: Colors.red,
                                       onTap: () {
                                         Navigator.pop(context);
-                                        // Implement camera
+                                        _pickImageFromCamera(); // Use our new method
                                       },
                                     ),
                                     _buildAttachmentOption(
@@ -468,6 +603,11 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                                       onTap: () {
                                         Navigator.pop(context);
                                         // Implement document picker
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                            content: Text('Document sharing coming soon'),
+                                          ),
+                                        );
                                       },
                                     ),
                                   ],
