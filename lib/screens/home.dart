@@ -2,6 +2,7 @@
 import 'package:e_health_front/screens/article/allArticle.dart';
 import 'package:e_health_front/screens/article/articleDetail.dart';
 import 'package:e_health_front/screens/doctor/doctorProfilScreen.dart';
+import 'package:e_health_front/screens/speciality/allSpecialityScreen.dart';
 import 'package:e_health_front/services/api_service.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -11,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:e_health_front/providers/user_provider.dart';
 import 'package:e_health_front/providers/article_provider.dart';
 import '../widgets/speciality.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
   Future<Map<String, dynamic>?> _getNextAppointment() async {
@@ -153,7 +155,14 @@ class HomeScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AllSpecialitiesScreen(),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],

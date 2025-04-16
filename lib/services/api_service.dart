@@ -81,7 +81,7 @@ class ApiService {
         headers: {"Content-Type": "application/json"},
       );
       final userData = jsonDecode(userResponse.body);
-
+      print("articles: $articles");
       return {
         "userData": userData,
         "loginResponse": jsonDecode(response.body),
@@ -317,6 +317,17 @@ class ApiService {
     confirmedAppointments.sort(
       (a, b) => DateTime.parse(a['date']).compareTo(DateTime.parse(b['date'])),
     );
+    for (int i = 0; i < confirmedAppointments.length; i++) {
+    String doctorId = confirmedAppointments[i]['doctor']['_id'];
+    try {
+      Map<String, dynamic> doctorDetails = await fetchDoctorById(doctorId);
+      
+      // Add doctor's image to the appointment
+      confirmedAppointments[i]['doctor']['image'] = doctorDetails['image'];
+    } catch (e) {
+      confirmedAppointments[i]['doctor']['image'] = null; // Optional default
+    }
+  }
 
     return confirmedAppointments;
   }
@@ -333,23 +344,50 @@ class ApiService {
     pendingAppointments.sort(
       (a, b) => DateTime.parse(a['date']).compareTo(DateTime.parse(b['date'])),
     );
-
+    for (int i = 0; i < pendingAppointments.length; i++) {
+    String doctorId = pendingAppointments[i]['doctor']['_id'];
+    try {
+      Map<String, dynamic> doctorDetails = await fetchDoctorById(doctorId);
+      
+      // Add doctor's image to the appointment
+      pendingAppointments[i]['doctor']['image'] = doctorDetails['image'];
+    } catch (e) {
+      pendingAppointments[i]['doctor']['image'] = null; // Optional default
+    }
+  }
     return pendingAppointments;
   }
 
   Future<List<Map<String, dynamic>>> fetchCanceledAppointments() async {
-    List<Map<String, dynamic>> myAppointments = await fetchMyAppointments();
-    List<Map<String, dynamic>> canceledAppointments =
-        myAppointments
-            .where((appointment) => appointment['status'] == 'canceled')
-            .toList();
-    // Trier les rendez-vous en fonction de la date
-    canceledAppointments.sort(
-      (a, b) => DateTime.parse(b['date']).compareTo(DateTime.parse(a['date'])),
-    );
-    return canceledAppointments;
+  // Fetch all appointments
+  List<Map<String, dynamic>> myAppointments = await fetchMyAppointments();
+  
+  // Filter to get only canceled appointments
+  List<Map<String, dynamic>> canceledAppointments = myAppointments
+      .where((appointment) => appointment['status'] == 'canceled')
+      .toList();
+  
+  // Sort appointments by date (most recent first)
+  canceledAppointments.sort(
+    (a, b) => DateTime.parse(b['date']).compareTo(DateTime.parse(a['date'])),
+  );
+  
+  // Enhance each appointment with doctor's image
+  for (int i = 0; i < canceledAppointments.length; i++) {
+    String doctorId = canceledAppointments[i]['doctor']['_id'];
+    try {
+      Map<String, dynamic> doctorDetails = await fetchDoctorById(doctorId);
+      
+      // Add doctor's image to the appointment
+      canceledAppointments[i]['doctor']['image'] = doctorDetails['image'];
+    } catch (e) {
+      canceledAppointments[i]['doctor']['image'] = null; // Optional default
+    }
   }
-
+  
+  return canceledAppointments;
+}
+  
   Future<List<Map<String, dynamic>>> fetchCompletedAppointments(
     String iddoctor,
   ) async {
@@ -367,6 +405,17 @@ class ApiService {
       (a, b) => DateTime.parse(a['date']).compareTo(DateTime.parse(b['date'])),
     );
 
+    for (int i = 0; i < completedAppointments.length; i++) {
+    String doctorId = completedAppointments[i]['doctor']['_id'];
+    try {
+      Map<String, dynamic> doctorDetails = await fetchDoctorById(doctorId);
+      
+      // Add doctor's image to the appointment
+      completedAppointments[i]['doctor']['image'] = doctorDetails['image'];
+    } catch (e) {
+      completedAppointments[i]['doctor']['image'] = null; // Optional default
+    }
+  }
     return completedAppointments;
   }
 
@@ -539,8 +588,64 @@ class ApiService {
     }
   }
 
-  // Future<void> logout() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   await prefs.remove('token'); // Supprime le token
-  // }
+  Future<List<Map<String, dynamic>>> getDoctorsBySpeciality({
+    required String specialityName,
+  }) async {
+    final url = Uri.parse('$baseUrl/doctors/speciality/$specialityName');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        // Ajoute "Authorization" si ton API est protégée par JWT
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      print(data);
+      return data.cast<Map<String, dynamic>>();
+    } else {
+      throw Exception('Erreur de chargement des docteurs : ${response.body}');
+    }
+  }
+
+  Future<Map<String, dynamic>> updatePasswordByOldPassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    final url = Uri.parse("$baseUrl/auth/change-password");
+    await loadToken();
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'oldPassword': oldPassword,
+          'newPassword': newPassword,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {"success": true, "message": data["message"]};
+      } else {
+        return {
+          "success": false,
+          "message": data["message"] ?? "Erreur inconnue",
+        };
+      }
+    } catch (e) {
+      return {"success": false, "message": "Erreur de connexion"};
+    }
+  }
+
+  Future<void> logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token'); // Supprime le token
+  }
 }

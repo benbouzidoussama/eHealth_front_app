@@ -1,4 +1,7 @@
+import 'package:e_health_front/screens/auth/loginScreen.dart';
+import 'package:e_health_front/screens/profil/UpdatePasswordByOldPasswordScreen.dart';
 import 'package:e_health_front/screens/profil/updateProfilScreen.dart';
+import 'package:e_health_front/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:e_health_front/providers/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +50,7 @@ class ProfilScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                    userData?["firstName"] + " " + userData?["lastName"] ??
+                  userData?["firstName"] + " " + userData?["lastName"] ??
                       "Nom Prénom",
                   style: TextStyle(
                     color: Colors.black,
@@ -88,6 +91,15 @@ class ProfilScreen extends StatelessWidget {
                     Icons.lock,
                     'Changer le mot de passe',
                     context,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => UpdatePasswordByOldPasswordScreen(),
+                        ),
+                      );
+                    },
                   ),
                   _buildSettingsItem(
                     Icons.notifications,
@@ -101,6 +113,47 @@ class ProfilScreen extends StatelessWidget {
                     'Déconnexion',
                     context,
                     isLogout: true,
+                    onTap: () {
+                      // Afficher la boîte de dialogue de confirmation
+                      showDialog(
+                        context: context,
+                        builder:
+                            (context) => AlertDialog(
+                              title: const Text('Déconnexion'),
+                              content: const Text(
+                                'Êtes-vous sûr de vouloir vous déconnecter ?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('Annuler'),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    // Appel de la fonction logout du ApiService
+                                    final apiService = ApiService();
+                                    await apiService.logout();
+                                    // Fermer le dialogue
+                                    Navigator.of(context).pop();
+                                    // Rediriger vers l'écran de connexion et effacer l'historique de navigation
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) =>
+                                                LoginScreen(), // Remplacez par votre écran de connexion
+                                      ),
+                                      (route) =>
+                                          false, // Ceci supprime toutes les routes précédentes
+                                    );
+                                  },
+                                  child: const Text('Déconnexion'),
+                                ),
+                              ],
+                            ),
+                      );
+                    },
                   ),
                 ],
               ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../services/chat_service.dart';
+import '../../services/chat_service.dart';
 import 'dart:io'; // Add this import
 import 'package:image_picker/image_picker.dart'; // Need to add this package to pubspec.yaml
 

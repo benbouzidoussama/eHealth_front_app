@@ -1,8 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:e_health_front/screens/appointment/bookAppointment.dart';
 import 'package:e_health_front/screens/doctor/doctorProfilScreen.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:e_health_front/providers/doctor_provider.dart';
+import 'package:e_health_front/services/api_service.dart'; // Importer le service API
 
 class DoctorScreen extends StatefulWidget {
   const DoctorScreen({super.key});
@@ -13,16 +12,19 @@ class DoctorScreen extends StatefulWidget {
 
 class _DoctorScreenState extends State<DoctorScreen> {
   final TextEditingController _searchController = TextEditingController();
+  String selectedValue = 'tous';
+  List<Map<String, dynamic>> allDoctors = [];
+  List<Map<String, dynamic>> filteredDoctors = [];
+  bool isLoading = true;
+  final ApiService _apiService = ApiService(); // Instance du service API
 
   @override
   void initState() {
     super.initState();
     _searchController.addListener(() {
-      Provider.of<DoctorProvider>(
-        context,
-        listen: false,
-      ).filterDoctors(_searchController.text);
+      filterDoctors(_searchController.text);
     });
+    loadDoctors(selectedValue);
   }
 
   @override
@@ -31,17 +33,74 @@ class _DoctorScreenState extends State<DoctorScreen> {
     super.dispose();
   }
 
+  // Charger les docteurs en fonction du type de filtre sélectionné
+  Future<void> loadDoctors(String filterType) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      List<Map<String, dynamic>> doctors;
+      if (filterType == 'tous') {
+        doctors = await _apiService.fetchAllDoctors();
+      } else if (filterType == 'mes') {
+        doctors = await _apiService.fetchMyDoctors();
+      } else {
+        doctors = [];
+      }
+
+      setState(() {
+        allDoctors = doctors;
+        filterDoctors(_searchController.text);
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        allDoctors = [];
+        filteredDoctors = [];
+      });
+      // Gérer l'erreur - afficher un snackbar ou une boîte de dialogue
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erreur: ${e.toString()}')));
+    }
+  }
+
+  // Filtrer les docteurs en fonction du texte de recherche
+  void filterDoctors(String searchText) {
+    setState(() {
+      if (searchText.isEmpty) {
+        filteredDoctors = List.from(allDoctors);
+      } else {
+        filteredDoctors =
+            allDoctors.where((doctor) {
+              final firstName =
+                  doctor['firstName']?.toString().toLowerCase() ?? '';
+              final lastName =
+                  doctor['lastName']?.toString().toLowerCase() ?? '';
+              final speciality =
+                  doctor['speciality']?.toString().toLowerCase() ?? '';
+              final fullName = '$firstName $lastName'.toLowerCase();
+              final query = searchText.toLowerCase();
+
+              return firstName.contains(query) ||
+                  lastName.contains(query) ||
+                  fullName.contains(query) ||
+                  speciality.contains(query);
+            }).toList();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final doctorProvider = Provider.of<DoctorProvider>(context);
-
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: false, // Supprime l'icône de retour
+        automaticallyImplyLeading: false,
         elevation: 0,
-
         title: const Text(
           'Docteurs',
           style: TextStyle(
@@ -69,10 +128,9 @@ class _DoctorScreenState extends State<DoctorScreen> {
                   ),
                 ),
                 DropdownButton<String>(
-                  value: doctorProvider.selectedValue,
+                  value: selectedValue,
                   dropdownColor: Colors.white,
                   items: const [
-                    DropdownMenuItem(value: 'filter', child: Text('Filtrer')),
                     DropdownMenuItem(
                       value: 'tous',
                       child: Text('Tous les docteurs'),
@@ -80,11 +138,11 @@ class _DoctorScreenState extends State<DoctorScreen> {
                     DropdownMenuItem(value: 'mes', child: Text('Mes docteurs')),
                   ],
                   onChanged: (String? newValue) {
-                    doctorProvider.selectedValue = newValue!;
-                    if (newValue != 'filter') {
-                      doctorProvider.fetchDoctors(newValue);
-                    } else {
-                      doctorProvider.filterDoctors(_searchController.text);
+                    if (newValue != null && newValue != selectedValue) {
+                      setState(() {
+                        selectedValue = newValue;
+                      });
+                      loadDoctors(newValue);
                     }
                   },
                 ),
@@ -106,7 +164,12 @@ class _DoctorScreenState extends State<DoctorScreen> {
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: DoctorGrid(doctors: doctorProvider.filteredDoctors),
+              child:
+                  isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : filteredDoctors.isEmpty
+                      ? const Center(child: Text('Aucun docteur trouvé'))
+                      : DoctorGrid(doctors: filteredDoctors),
             ),
           ],
         ),

@@ -1,7 +1,7 @@
 import 'package:e_health_front/services/api_service.dart';
 import 'package:flutter/material.dart';
-import 'package:e_health_front/screens/chatDetailScreen.dart';
-import '../services/chat_service.dart';
+import 'package:e_health_front/screens/chat/chatDetailScreen.dart';
+import '../../services/chat_service.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 
@@ -722,23 +722,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
         ],
       ),
     );
-  }
-
-  Future<List<dynamic>> _doctorNotHaveChat() async {
-    final myDoctor = await ApiService().fetchMyDoctors();
-    final doctorHaveChat = await ChatService().getChats();
-
-    // Extract the IDs of doctors who have a chat
-    final doctorWithChatIds =
-        doctorHaveChat.map((chat) => chat['doctor']['_id']).toSet();
-
-    // Keep only the doctors who don't have a chat
-    final doctorsWithoutChat =
-        myDoctor
-            .where((doc) => !doctorWithChatIds.contains(doc['_id']))
-            .toList();
-
-    return doctorsWithoutChat;
   }
 }
 

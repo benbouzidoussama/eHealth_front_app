@@ -78,9 +78,10 @@ class _UpcomingScreenState extends State<UpcomingScreen> {
                               ),
                               subtitle: Text(doctor['speciality']),
                               trailing: CircleAvatar(
-                                backgroundImage: const AssetImage(
-                                  'images/profil.jpeg',
-                                ),
+                                backgroundImage:
+                                    doctor['image'] != null
+                                        ? NetworkImage(doctor['image'])
+                                        : AssetImage('images/avatar.jpg'),
                                 radius: 35,
                               ),
                             ),

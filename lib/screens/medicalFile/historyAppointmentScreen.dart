@@ -1,7 +1,7 @@
-import 'package:e_health_front/screens/appointment/noteScreen.dart';
-import 'package:e_health_front/screens/appointment/ordonnanceScreen.dart';
-import 'package:e_health_front/screens/appointment/regimeScreen.dart';
-import 'package:e_health_front/screens/pdfViewerScreen.dart'; // Ensure this import is correct and the file exists
+import 'package:e_health_front/screens/medicalFile/noteScreen.dart';
+import 'package:e_health_front/screens/medicalFile/ordonnanceScreen.dart';
+import 'package:e_health_front/screens/medicalFile/regimeScreen.dart';
+import 'package:e_health_front/screens/medicalFile/pdfViewerScreen.dart'; // Ensure this import is correct and the file exists
 import 'package:flutter/material.dart';
 import 'package:e_health_front/services/api_service.dart';
 

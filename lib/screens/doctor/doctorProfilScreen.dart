@@ -1,5 +1,5 @@
 import 'package:e_health_front/screens/appointment/bookAppointment.dart';
-import 'package:e_health_front/screens/appointment/historyAppointmentScreen.dart';
+import 'package:e_health_front/screens/medicalFile/historyAppointmentScreen.dart';
 import 'package:flutter/material.dart';
 
 //
@@ -43,9 +43,10 @@ class DoctorProfilScreen extends StatelessWidget {
                 ),
                 child: CircleAvatar(
                   radius: 60,
-                  backgroundImage: NetworkImage(
-                    doctor['image'] ?? 'https://via.placeholder.com/150',
-                  ), // Image du docteur
+                  backgroundImage:
+                      doctor['image'] != null
+                          ? NetworkImage(doctor['image'])
+                          : AssetImage('images/avatar.jpg'), // Image du docteur
                 ),
               ),
               const SizedBox(height: 16),
@@ -153,7 +154,9 @@ class DoctorProfilScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => HistoryAppointmentScreen(doctorId: doctor['_id'],),
+                      builder:
+                          (context) =>
+                              HistoryAppointmentScreen(doctorId: doctor['_id']),
                     ),
                   );
                 },
