@@ -318,16 +318,16 @@ class ApiService {
       (a, b) => DateTime.parse(a['date']).compareTo(DateTime.parse(b['date'])),
     );
     for (int i = 0; i < confirmedAppointments.length; i++) {
-    String doctorId = confirmedAppointments[i]['doctor']['_id'];
-    try {
-      Map<String, dynamic> doctorDetails = await fetchDoctorById(doctorId);
-      
-      // Add doctor's image to the appointment
-      confirmedAppointments[i]['doctor']['image'] = doctorDetails['image'];
-    } catch (e) {
-      confirmedAppointments[i]['doctor']['image'] = null; // Optional default
+      String doctorId = confirmedAppointments[i]['doctor']['_id'];
+      try {
+        Map<String, dynamic> doctorDetails = await fetchDoctorById(doctorId);
+
+        // Add doctor's image to the appointment
+        confirmedAppointments[i]['doctor']['image'] = doctorDetails['image'];
+      } catch (e) {
+        confirmedAppointments[i]['doctor']['image'] = null; // Optional default
+      }
     }
-  }
 
     return confirmedAppointments;
   }
@@ -345,49 +345,50 @@ class ApiService {
       (a, b) => DateTime.parse(a['date']).compareTo(DateTime.parse(b['date'])),
     );
     for (int i = 0; i < pendingAppointments.length; i++) {
-    String doctorId = pendingAppointments[i]['doctor']['_id'];
-    try {
-      Map<String, dynamic> doctorDetails = await fetchDoctorById(doctorId);
-      
-      // Add doctor's image to the appointment
-      pendingAppointments[i]['doctor']['image'] = doctorDetails['image'];
-    } catch (e) {
-      pendingAppointments[i]['doctor']['image'] = null; // Optional default
+      String doctorId = pendingAppointments[i]['doctor']['_id'];
+      try {
+        Map<String, dynamic> doctorDetails = await fetchDoctorById(doctorId);
+
+        // Add doctor's image to the appointment
+        pendingAppointments[i]['doctor']['image'] = doctorDetails['image'];
+      } catch (e) {
+        pendingAppointments[i]['doctor']['image'] = null; // Optional default
+      }
     }
-  }
     return pendingAppointments;
   }
 
   Future<List<Map<String, dynamic>>> fetchCanceledAppointments() async {
-  // Fetch all appointments
-  List<Map<String, dynamic>> myAppointments = await fetchMyAppointments();
-  
-  // Filter to get only canceled appointments
-  List<Map<String, dynamic>> canceledAppointments = myAppointments
-      .where((appointment) => appointment['status'] == 'canceled')
-      .toList();
-  
-  // Sort appointments by date (most recent first)
-  canceledAppointments.sort(
-    (a, b) => DateTime.parse(b['date']).compareTo(DateTime.parse(a['date'])),
-  );
-  
-  // Enhance each appointment with doctor's image
-  for (int i = 0; i < canceledAppointments.length; i++) {
-    String doctorId = canceledAppointments[i]['doctor']['_id'];
-    try {
-      Map<String, dynamic> doctorDetails = await fetchDoctorById(doctorId);
-      
-      // Add doctor's image to the appointment
-      canceledAppointments[i]['doctor']['image'] = doctorDetails['image'];
-    } catch (e) {
-      canceledAppointments[i]['doctor']['image'] = null; // Optional default
+    // Fetch all appointments
+    List<Map<String, dynamic>> myAppointments = await fetchMyAppointments();
+
+    // Filter to get only canceled appointments
+    List<Map<String, dynamic>> canceledAppointments =
+        myAppointments
+            .where((appointment) => appointment['status'] == 'canceled')
+            .toList();
+
+    // Sort appointments by date (most recent first)
+    canceledAppointments.sort(
+      (a, b) => DateTime.parse(b['date']).compareTo(DateTime.parse(a['date'])),
+    );
+
+    // Enhance each appointment with doctor's image
+    for (int i = 0; i < canceledAppointments.length; i++) {
+      String doctorId = canceledAppointments[i]['doctor']['_id'];
+      try {
+        Map<String, dynamic> doctorDetails = await fetchDoctorById(doctorId);
+
+        // Add doctor's image to the appointment
+        canceledAppointments[i]['doctor']['image'] = doctorDetails['image'];
+      } catch (e) {
+        canceledAppointments[i]['doctor']['image'] = null; // Optional default
+      }
     }
+
+    return canceledAppointments;
   }
-  
-  return canceledAppointments;
-}
-  
+
   Future<List<Map<String, dynamic>>> fetchCompletedAppointments(
     String iddoctor,
   ) async {
@@ -406,16 +407,16 @@ class ApiService {
     );
 
     for (int i = 0; i < completedAppointments.length; i++) {
-    String doctorId = completedAppointments[i]['doctor']['_id'];
-    try {
-      Map<String, dynamic> doctorDetails = await fetchDoctorById(doctorId);
-      
-      // Add doctor's image to the appointment
-      completedAppointments[i]['doctor']['image'] = doctorDetails['image'];
-    } catch (e) {
-      completedAppointments[i]['doctor']['image'] = null; // Optional default
+      String doctorId = completedAppointments[i]['doctor']['_id'];
+      try {
+        Map<String, dynamic> doctorDetails = await fetchDoctorById(doctorId);
+
+        // Add doctor's image to the appointment
+        completedAppointments[i]['doctor']['image'] = doctorDetails['image'];
+      } catch (e) {
+        completedAppointments[i]['doctor']['image'] = null; // Optional default
+      }
     }
-  }
     return completedAppointments;
   }
 

@@ -1,5 +1,4 @@
 import 'package:e_health_front/screens/speciality/DoctorsBySpecialityScreen.dart';
-import 'package:e_health_front/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:e_health_front/screens/styles/colors.dart';
 
