@@ -316,7 +316,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
       // Create a new chat using the existing createChat method
       final response = await ChatService().createChat(
-        token: token,
+        //token: token,
         doctorId: doctor['_id'],
       );
 

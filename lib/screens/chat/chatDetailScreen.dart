@@ -1,36 +1,93 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/chat_service.dart';
-import 'dart:io'; // Add this import
-import 'package:image_picker/image_picker.dart'; // Need to add this package to pubspec.yaml
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class ChatDetailScreen extends StatefulWidget {
   final String chatId;
   final dynamic doctor;
 
   const ChatDetailScreen({Key? key, required this.chatId, required this.doctor})
-    : super(key: key);
+      : super(key: key);
 
   @override
   _ChatDetailScreenState createState() => _ChatDetailScreenState();
 }
 
 class _ChatDetailScreenState extends State<ChatDetailScreen> {
-  late Future<List<dynamic>> _messagesFuture;
+  late List<dynamic> _messages = [];
+  bool _isLoading = true;
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final ImagePicker _imagePicker = ImagePicker(); // Initialize image picker
-  String _currentUserId =
-      "67c0500e8120019fe5ed3532"; // This should be dynamically set from your auth service
+  final ImagePicker _imagePicker = ImagePicker();
+  String _currentUserId = "67c0500e8120019fe5ed3532"; // Dynamically set this from auth service
+  final ChatService _chatService = ChatService();
 
   @override
   void initState() {
     super.initState();
-    _messagesFuture = ChatService().getMessages(widget.chatId);
+    _loadMessages();
+    _setupSocketConnection();
+    
     // Scroll to bottom when messages load
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
     });
+  }
+
+  @override
+  void dispose() {
+    // Clean up socket connections when leaving the screen
+    _chatService.leaveChat(widget.chatId);
+    _chatService.stopListening();
+    _messageController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _setupSocketConnection() async {
+    try {
+      await _chatService.initializeSocket();
+      _chatService.joinChat(widget.chatId);
+      _chatService.listenForMessages(widget.chatId, _handleNewMessage);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to connect to chat: $e')),
+      );
+    }
+  }
+
+  void _handleNewMessage(dynamic message) {
+    setState(() {
+      _messages.add(message);
+    });
+    
+    // Scroll to bottom when new message arrives
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom();
+    });
+  }
+
+  Future<void> _loadMessages() async {
+    setState(() {
+      _isLoading = true;
+    });
+    
+    try {
+      final messages = await _chatService.getMessages(widget.chatId);
+      setState(() {
+        _messages = messages;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load messages: $e')),
+      );
+    }
   }
 
   void _scrollToBottom() {
@@ -65,7 +122,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       _messageController.clear();
       
       // Get the token
-      final token = await ChatService().getToken();
+      final token = await _chatService.getToken();
       
       if (token == null) {
         // Handle case where user is not authenticated
@@ -77,28 +134,15 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       
       try {
         // Send the message to the API
-        final response = await ChatService().sendTextMessage(
+        await _chatService.sendTextMessage(
           token: token,
           chatId: widget.chatId,
           content: message,
         );
         
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          // Message sent successfully, refresh the message list
-          setState(() {
-            _messagesFuture = ChatService().getMessages(widget.chatId);
-          });
-          
-          // Scroll to bottom after sending
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _scrollToBottom();
-          });
-        } else {
-          // Handle error response
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to send message: ${response.statusCode}')),
-          );
-        }
+        // No need to refresh message list - socket will handle it
+        // Socket will emit the new message to all connected clients
+        
       } catch (e) {
         // Handle exceptions
         ScaffoldMessenger.of(context).showSnackBar(
@@ -159,7 +203,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     
     try {
       // Get the token
-      final token = await ChatService().getToken();
+      final token = await _chatService.getToken();
       
       if (token == null) {
         // Close loading dialog
@@ -171,7 +215,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       }
       
       // Send the image using ChatService
-      final response = await ChatService().sendImageMessage(
+      await _chatService.sendImageMessage(
         token: token,
         chatId: widget.chatId,
         imageFile: imageFile,
@@ -180,22 +224,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       // Close loading dialog
       Navigator.pop(context);
       
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        // Image sent successfully, refresh the message list
-        setState(() {
-          _messagesFuture = ChatService().getMessages(widget.chatId);
-        });
-        
-        // Scroll to bottom after sending
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _scrollToBottom();
-        });
-      } else {
-        // Handle error response
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to send image: ${response.statusCode}')),
-        );
-      }
+      // No need to refresh message list - socket will handle it
+      
     } catch (e) {
       // Close loading dialog
       Navigator.pop(context);
@@ -245,298 +275,214 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(color: Colors.grey[100]),
-              child: FutureBuilder<List<dynamic>>(
-                future: _messagesFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.error_outline,
-                            size: 48,
-                            color: Colors.red,
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _messages.isEmpty
+                      ? const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.chat_bubble_outline,
+                                size: 64,
+                                color: Colors.grey,
+                              ),
+                              SizedBox(height: 10),
+                              Text(
+                                'No messages yet',
+                                style: TextStyle(color: Colors.grey, fontSize: 16),
+                              ),
+                              SizedBox(height: 5),
+                              Text(
+                                'Send a message to start the conversation',
+                                style: TextStyle(color: Colors.grey, fontSize: 14),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 10),
-                          Text(
-                            'Error: ${snapshot.error}',
-                            style: const TextStyle(color: Colors.red),
-                          ),
-                          const SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                _messagesFuture = ChatService().getMessages(
-                                  widget.chatId,
-                                );
-                              });
-                            },
-                            child: const Text('Retry'),
-                          ),
-                        ],
-                      ),
-                    );
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.chat_bubble_outline,
-                            size: 64,
-                            color: Colors.grey,
-                          ),
-                          SizedBox(height: 10),
-                          Text(
-                            'No messages yet',
-                            style: TextStyle(color: Colors.grey, fontSize: 16),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            'Send a message to start the conversation',
-                            style: TextStyle(color: Colors.grey, fontSize: 14),
-                          ),
-                        ],
-                      ),
-                    );
-                  } else {
-                    final messages = snapshot.data!;
-                    return ListView.builder(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.all(10),
-                      itemCount: messages.length,
-                      itemBuilder: (context, index) {
-                        final message = messages[index];
-                        final isCurrentUser =
-                            message['sender'] == _currentUserId;
-                        final isImage = message['type'] == 'image';
-                        final prevMessage =
-                            index > 0 ? messages[index - 1] : null;
-                        final showTimestamp =
-                            prevMessage == null ||
-                            prevMessage['sender'] != message['sender'] ||
-                            DateTime.parse(message['timestamp'])
+                        )
+                      : ListView.builder(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.all(10),
+                          itemCount: _messages.length,
+                          itemBuilder: (context, index) {
+                            final message = _messages[index];
+                            final isCurrentUser = message['sender'] == _currentUserId;
+                            final isImage = message['type'] == 'image';
+                            final prevMessage = index > 0 ? _messages[index - 1] : null;
+                            final showTimestamp =
+                                prevMessage == null ||
+                                prevMessage['sender'] != message['sender'] ||
+                                DateTime.parse(message['timestamp'])
                                     .difference(
                                       DateTime.parse(prevMessage['timestamp']),
                                     )
                                     .inMinutes >
-                                5;
+                                    5;
 
-                        return Column(
-                          crossAxisAlignment:
-                              isCurrentUser
-                                  ? CrossAxisAlignment.end
-                                  : CrossAxisAlignment.start,
-                          children: [
-                            if (showTimestamp || index == 0)
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  top: 16,
-                                  bottom: 8,
-                                ),
-                                child: Center(
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 4,
+                            return Column(
+                              crossAxisAlignment:
+                                  isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                              children: [
+                                if (showTimestamp || index == 0)
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 16,
+                                      bottom: 8,
                                     ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[300],
-                                      borderRadius: BorderRadius.circular(12),
+                                    child: Center(
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[300],
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Text(
+                                          _formatTimestamp(message['timestamp']),
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey[700],
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                    child: Text(
-                                      _formatTimestamp(message['timestamp']),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[700],
+                                  ),
+                                Container(
+                                  margin: const EdgeInsets.symmetric(vertical: 4),
+                                  constraints: BoxConstraints(
+                                    maxWidth: MediaQuery.of(context).size.width * 0.75,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isCurrentUser ? Colors.blue[500] : Colors.white,
+                                    borderRadius: BorderRadius.circular(15),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.05),
+                                        blurRadius: 3,
+                                        offset: const Offset(0, 1),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(15),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onLongPress: () {
+                                          // Show options menu (copy, delete, etc.)
+                                        },
+                                        child: Padding(
+                                          padding: isImage
+                                              ? EdgeInsets.zero
+                                              : const EdgeInsets.symmetric(
+                                                  horizontal: 12,
+                                                  vertical: 10,
+                                                ),
+                                          child: isImage
+                                              ? Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                                  children: [
+                                                    Image.network(
+                                                      message['content'],
+                                                      fit: BoxFit.cover,
+                                                      width: MediaQuery.of(context).size.width * 0.6,
+                                                      loadingBuilder: (
+                                                        context,
+                                                        child,
+                                                        loadingProgress,
+                                                      ) {
+                                                        if (loadingProgress == null) return child;
+                                                        return Container(
+                                                          width: MediaQuery.of(context).size.width * 0.6,
+                                                          height: 200,
+                                                          alignment: Alignment.center,
+                                                          child: CircularProgressIndicator(
+                                                            value: loadingProgress.expectedTotalBytes != null
+                                                                ? loadingProgress.cumulativeBytesLoaded /
+                                                                    loadingProgress.expectedTotalBytes!
+                                                                : null,
+                                                          ),
+                                                        );
+                                                      },
+                                                      errorBuilder: (
+                                                        context,
+                                                        error,
+                                                        stackTrace,
+                                                      ) {
+                                                        return Container(
+                                                          width: MediaQuery.of(context).size.width * 0.6,
+                                                          height: 100,
+                                                          alignment: Alignment.center,
+                                                          color: Colors.grey[300],
+                                                          child: const Column(
+                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            children: [
+                                                              Icon(
+                                                                Icons.error,
+                                                                color: Colors.red,
+                                                              ),
+                                                              SizedBox(height: 4),
+                                                              Text(
+                                                                "Failed to load image",
+                                                                style: TextStyle(
+                                                                  fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+                                                    Padding(
+                                                      padding: const EdgeInsets.only(
+                                                        right: 8,
+                                                        bottom: 4,
+                                                      ),
+                                                      child: Text(
+                                                        _formatTimestamp(message['timestamp']),
+                                                        style: TextStyle(
+                                                          fontSize: 10,
+                                                          color: isCurrentUser
+                                                              ? Colors.white70
+                                                              : Colors.grey[600],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              : Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                                  children: [
+                                                    Text(
+                                                      message['content'],
+                                                      style: TextStyle(
+                                                        color: isCurrentUser ? Colors.white : Colors.black,
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 2),
+                                                    Text(
+                                                      _formatTimestamp(message['timestamp']),
+                                                      style: TextStyle(
+                                                        fontSize: 10,
+                                                        color: isCurrentUser
+                                                            ? Colors.white70
+                                                            : Colors.grey[600],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            Container(
-                              margin: const EdgeInsets.symmetric(vertical: 4),
-                              constraints: BoxConstraints(
-                                maxWidth:
-                                    MediaQuery.of(context).size.width * 0.75,
-                              ),
-                              decoration: BoxDecoration(
-                                color:
-                                    isCurrentUser
-                                        ? Colors.blue[500]
-                                        : Colors.white,
-                                borderRadius: BorderRadius.circular(15),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
-                                    blurRadius: 3,
-                                    offset: const Offset(0, 1),
-                                  ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(15),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onLongPress: () {
-                                      // Show options menu (copy, delete, etc.)
-                                    },
-                                    child: Padding(
-                                      padding:
-                                          isImage
-                                              ? EdgeInsets.zero
-                                              : const EdgeInsets.symmetric(
-                                                horizontal: 12,
-                                                vertical: 10,
-                                              ),
-                                      child:
-                                          isImage
-                                              ? Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.end,
-                                                children: [
-                                                  Image.network(
-                                                    message['content'],
-                                                    fit: BoxFit.cover,
-                                                    width:
-                                                        MediaQuery.of(
-                                                          context,
-                                                        ).size.width *
-                                                        0.6,
-                                                    loadingBuilder: (
-                                                      context,
-                                                      child,
-                                                      loadingProgress,
-                                                    ) {
-                                                      if (loadingProgress ==
-                                                          null)
-                                                        return child;
-                                                      return Container(
-                                                        width:
-                                                            MediaQuery.of(
-                                                              context,
-                                                            ).size.width *
-                                                            0.6,
-                                                        height: 200,
-                                                        alignment:
-                                                            Alignment.center,
-                                                        child: CircularProgressIndicator(
-                                                          value:
-                                                              loadingProgress
-                                                                          .expectedTotalBytes !=
-                                                                      null
-                                                                  ? loadingProgress
-                                                                          .cumulativeBytesLoaded /
-                                                                      loadingProgress
-                                                                          .expectedTotalBytes!
-                                                                  : null,
-                                                        ),
-                                                      );
-                                                    },
-                                                    errorBuilder: (
-                                                      context,
-                                                      error,
-                                                      stackTrace,
-                                                    ) {
-                                                      return Container(
-                                                        width:
-                                                            MediaQuery.of(
-                                                              context,
-                                                            ).size.width *
-                                                            0.6,
-                                                        height: 100,
-                                                        alignment:
-                                                            Alignment.center,
-                                                        color: Colors.grey[300],
-                                                        child: const Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Icon(
-                                                              Icons.error,
-                                                              color: Colors.red,
-                                                            ),
-                                                            SizedBox(height: 4),
-                                                            Text(
-                                                              "Failed to load image",
-                                                              style: TextStyle(
-                                                                fontSize: 12,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                          right: 8,
-                                                          bottom: 4,
-                                                        ),
-                                                    child: Text(
-                                                      _formatTimestamp(
-                                                        message['timestamp'],
-                                                      ),
-                                                      style: TextStyle(
-                                                        fontSize: 10,
-                                                        color:
-                                                            isCurrentUser
-                                                                ? Colors.white70
-                                                                : Colors
-                                                                    .grey[600],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              )
-                                              : Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.end,
-                                                children: [
-                                                  Text(
-                                                    message['content'],
-                                                    style: TextStyle(
-                                                      color:
-                                                          isCurrentUser
-                                                              ? Colors.white
-                                                              : Colors.black,
-                                                      fontSize: 16,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 2),
-                                                  Text(
-                                                    _formatTimestamp(
-                                                      message['timestamp'],
-                                                    ),
-                                                    style: TextStyle(
-                                                      fontSize: 10,
-                                                      color:
-                                                          isCurrentUser
-                                                              ? Colors.white70
-                                                              : Colors
-                                                                  .grey[600],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  }
-                },
-              ),
+                              ],
+                            );
+                          },
+                        ),
             ),
           ),
           Container(
@@ -560,61 +506,59 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                     // Show attachment options
                     showModalBottomSheet(
                       context: context,
-                      builder:
-                          (context) => Container(
-                            height: 180,
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
+                      builder: (context) => Container(
+                        height: 180,
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          children: [
+                            const Text(
+                              "Share Content",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                const Text(
-                                  "Share Content",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                  ),
+                                _buildAttachmentOption(
+                                  icon: Icons.photo,
+                                  label: "Gallery",
+                                  color: Colors.purple,
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    _pickImageFromGallery();
+                                  },
                                 ),
-                                const SizedBox(height: 20),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    _buildAttachmentOption(
-                                      icon: Icons.photo,
-                                      label: "Gallery",
-                                      color: Colors.purple,
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                        _pickImageFromGallery(); // Use our new method
-                                      },
-                                    ),
-                                    _buildAttachmentOption(
-                                      icon: Icons.camera_alt,
-                                      label: "Camera",
-                                      color: Colors.red,
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                        _pickImageFromCamera(); // Use our new method
-                                      },
-                                    ),
-                                    _buildAttachmentOption(
-                                      icon: Icons.description,
-                                      label: "Document",
-                                      color: Colors.blue,
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                        // Implement document picker
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('Document sharing coming soon'),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ],
+                                _buildAttachmentOption(
+                                  icon: Icons.camera_alt,
+                                  label: "Camera",
+                                  color: Colors.red,
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    _pickImageFromCamera();
+                                  },
+                                ),
+                                _buildAttachmentOption(
+                                  icon: Icons.description,
+                                  label: "Document",
+                                  color: Colors.blue,
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    // Implement document picker
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Document sharing coming soon'),
+                                      ),
+                                    );
+                                  },
                                 ),
                               ],
                             ),
-                          ),
+                          ],
+                        ),
+                      ),
                     );
                   },
                 ),

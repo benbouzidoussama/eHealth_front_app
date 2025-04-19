@@ -81,7 +81,6 @@ class ApiService {
         headers: {"Content-Type": "application/json"},
       );
       final userData = jsonDecode(userResponse.body);
-      print("articles: $articles");
       return {
         "userData": userData,
         "loginResponse": jsonDecode(response.body),
