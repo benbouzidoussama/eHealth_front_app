@@ -1,3 +1,5 @@
+import 'package:e_health_front/screens/doctor/doctorProfilScreen.dart';
+import 'package:e_health_front/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:e_health_front/providers/article_provider.dart';
 import 'package:intl/intl.dart';
@@ -12,93 +14,221 @@ class ArticleDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final articleProvider = Provider.of<ArticleProvider>(context);
     final article = articleProvider.getArticleById(articleId);
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 1,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Article',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                article['titre'],
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
+      backgroundColor: Colors.white,
+      body: CustomScrollView(
+        slivers: [
+          // App Bar avec image en fond
+          SliverAppBar(
+            expandedHeight: 240,
+            pinned: true,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                fit: StackFit.expand,
                 children: [
-                  CircleAvatar(
-                    backgroundImage: const AssetImage('images/profil.jpeg'),
-                    radius: 24,
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        article['doctorName'],
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
+                  // Image de couverture avec dégradé
+                  if (article['image'] != null)
+                    Image.network(article['image'], fit: BoxFit.cover),
+                  // Dégradé pour améliorer la lisibilité
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.5),
+                        ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Publié le ${DateFormat.yMMMMd('fr_FR').format(DateTime.parse(article['createdAt']))}',
-                        style: const TextStyle(
-                          color: Colors.black54,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  'images/article.jpg',
-                  height: 220,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+            ),
+            leading: IconButton(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.black,
+                  size: 20,
                 ),
               ),
-              const SizedBox(height: 20),
-              Text(
-                article['description'],
-                style: const TextStyle(
-                  color: Colors.black87,
-                  fontSize: 16,
-                  height: 1.6,
-                ),
-              ),
-            ],
+              onPressed: () => Navigator.pop(context),
+            ),
           ),
-        ),
+
+          // Contenu de l'article
+          SliverToBoxAdapter(
+            child: Transform.translate(
+              offset: const Offset(0, -20),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, -5),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 30),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Catégorie
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          article['categorie'] ?? 'Santé',
+                          style: TextStyle(
+                            color: theme.primaryColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Titre
+                      Text(
+                        article['titre'],
+                        style: const TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          height: 1.3,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Info auteur et date
+                      Row(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: theme.primaryColor.withOpacity(0.3),
+                                width: 2,
+                              ),
+                            ),
+                            child: CircleAvatar(
+                              backgroundImage: const AssetImage(
+                                'images/profil.jpeg',
+                              ),
+                              radius: 24,
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                GestureDetector(
+                                  onTap: () async {
+                                    try {
+                                      final apiService = ApiService();
+                                      final doctorData = await apiService
+                                          .fetchDoctorById(
+                                            article['idDoctor']['_id'],
+                                          );
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => DoctorProfilScreen(
+                                                doctor: doctorData,
+                                              ),
+                                        ),
+                                      );
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Erreur : Impossible de charger les données du docteur',
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: Text(
+                                    article['doctorName'],
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.calendar_today_outlined,
+                                      size: 14,
+                                      color: Colors.black54,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      DateFormat.yMMMMd('fr_FR').format(
+                                        DateTime.parse(article['createdAt']),
+                                      ),
+                                      style: const TextStyle(
+                                        color: Colors.black54,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Contenu de l'article
+                      Text(
+                        article['description'],
+                        style: const TextStyle(
+                          fontSize: 17,
+                          height: 1.7,
+                          color: Color(0xFF303030),
+                        ),
+                      ),
+
+                      const SizedBox(height: 30),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
+      // Bouton flottant pour commentaires supprimé
     );
   }
 }

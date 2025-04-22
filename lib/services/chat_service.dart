@@ -9,10 +9,10 @@ import 'package:path/path.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ChatService {
-  final String baseUrl = "http://localhost:3000/api";
-  final String socketUrl = "http://localhost:3000";
-  //final String baseUrl = "http://10.0.2.2:3000/api";
-  //final String socketUrl = "http://10.0.2.2:3000";
+  //final String baseUrl = "http://localhost:3000/api";
+  //final String socketUrl = "http://localhost:3000";
+  final String baseUrl = "http://10.0.2.2:3000/api";
+  final String socketUrl = "http://10.0.2.2:3000";
   
   IO.Socket? socket;
   

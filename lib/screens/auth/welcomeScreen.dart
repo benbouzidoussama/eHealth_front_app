@@ -9,122 +9,252 @@ class WelcomeScreen extends StatefulWidget {
   State<WelcomeScreen> createState() => _WelcomeScreenState();
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen> {
+class _WelcomeScreenState extends State<WelcomeScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    );
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    //final size = MediaQuery.of(context).size;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Center(
-          child: RichText(
-            textAlign: TextAlign.center,
-            text: const TextSpan(
-              text: 'E',
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
+      body: Stack(
+        children: [
+          // Background image with overlay
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(
+                  'https://www.keckmedicine.org/wp-content/uploads/2021/11/Medical-doctors-and-nurse-practitioners-discuss-paperwork-in-a-hallway.jpg',
+                ),
+                fit: BoxFit.cover,
               ),
+            ),
+          ),
+          // Gradient overlay
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                colors: [
+                  Colors.blue.withOpacity(0.8),
+                  Colors.lightBlueAccent.withOpacity(0.6),
+                ],
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Column(
               children: [
-                TextSpan(
-                  text: '-H',
-                  style: TextStyle(color: Colors.black, fontSize: 30),
+                // Custom AppBar
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 20.0,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Text(
+                          "E-Health",
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                TextSpan(
-                  text: 'e',
-                  style: TextStyle(color: Colors.white, fontSize: 30),
+
+                // Main content
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // App icon or illustration
+                        FadeTransition(
+                          opacity: _animation,
+                          child: Container(
+                            width: 150,
+                            height: 150,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 15,
+                                  spreadRadius: 5,
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.favorite,
+                              size: 80,
+                              color: Colors.redAccent,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+
+                        // Slogan
+                        Text(
+                          "Votre santé, notre priorité",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                blurRadius: 3.0,
+                                color: Colors.black26,
+                                offset: Offset(1.0, 1.0),
+                              ),
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          "Suivez et gérez votre santé en toute simplicité",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white.withOpacity(0.9),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 60),
+
+                        // Login button
+                        _buildButton(
+                          text: 'Se connecter',
+                          icon: Icons.login,
+                          isPrimary: true,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LoginScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 20),
+
+                        // Register button
+                        _buildButton(
+                          text: 'Créer un compte',
+                          icon: Icons.person_add,
+                          isPrimary: false,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SignUpScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                TextSpan(
-                  text: 'eat',
-                  style: TextStyle(color: Colors.black, fontSize: 30),
-                ),
-                TextSpan(
-                  text: 'h',
-                  style: TextStyle(color: Colors.white, fontSize: 30),
+                // Footer text
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: Text(
+                    "© 2025 E-Health",
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
                 ),
               ],
             ),
           ),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.lightBlue,
+        ],
       ),
-      body: SingleChildScrollView(
+    );
+  }
+
+  Widget _buildButton({
+    required String text,
+    required IconData icon,
+    required bool isPrimary,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        splashColor: isPrimary ? Colors.white24 : Colors.blue.withOpacity(0.3),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          height: MediaQuery.of(context).size.height,
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(5)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.shade200,
-                offset: const Offset(2, 4),
-                blurRadius: 5,
-                spreadRadius: 2,
-              ),
-            ],
-            gradient: const LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Colors.lightBlue, Colors.blue],
-            ),
+            borderRadius: BorderRadius.circular(20),
+            color: isPrimary ? Colors.white : Colors.transparent,
+            border:
+                isPrimary ? null : Border.all(color: Colors.white, width: 2),
+            boxShadow:
+                isPrimary
+                    ? [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        spreadRadius: 0,
+                        offset: Offset(0, 5),
+                      ),
+                    ]
+                    : null,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LoginScreen(),
-                    ),
-                  );
-                },
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(15)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color(0xff42a5f5),
-                        offset: Offset(2, 4),
-                        blurRadius: 8,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                    color: Colors.white,
-                  ),
-                  child: const Text(
-                    'Login',
-                    style: TextStyle(fontSize: 20, color: Color(0xFF0389F6)),
-                  ),
-                ),
+              Icon(
+                icon,
+                color: isPrimary ? Colors.blue : Colors.white,
+                size: 22,
               ),
-              const SizedBox(height: 20),
-              InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SignUpScreen(),
-                    ),
-                  );
-                },
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  padding: const EdgeInsets.symmetric(vertical: 13),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(15)),
-                    border: Border.all(color: Colors.white, width: 2),
-                  ),
-                  child: const Text(
-                    'Register now',
-                    style: TextStyle(fontSize: 20, color: Colors.white),
-                  ),
+              const SizedBox(width: 10),
+              Text(
+                text,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: isPrimary ? Colors.blue : Colors.white,
                 ),
               ),
             ],

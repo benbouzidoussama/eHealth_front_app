@@ -552,14 +552,19 @@ class ArticlesList extends StatelessWidget {
                     ListTile(
                       leading: CircleAvatar(
                         radius: 25,
-                        backgroundImage: AssetImage('images/profil.jpeg'),
+                        backgroundImage:
+                            articles[index]['idDoctor']['image'] != null
+                                ? NetworkImage(
+                                  articles[index]['idDoctor']['image'],
+                                )
+                                : AssetImage('images/avatar.jpg'),
                       ),
                       title: GestureDetector(
                         onTap: () async {
                           try {
                             final apiService = ApiService();
                             final doctorData = await apiService.fetchDoctorById(
-                              articles[index]['idDoctor'],
+                              articles[index]['idDoctor']['_id'],
                             );
                             Navigator.push(
                               context,

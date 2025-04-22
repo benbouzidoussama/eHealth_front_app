@@ -5,8 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 
 class ApiService {
-  //final String baseUrl = "http://10.0.2.2:3000/api";
-  final String baseUrl = "http://localhost:3000/api";
+  final String baseUrl = "http://10.0.2.2:3000/api";
+  //final String baseUrl = "http://localhost:3000/api";
 
   String? token;
 
@@ -81,6 +81,7 @@ class ApiService {
         headers: {"Content-Type": "application/json"},
       );
       final userData = jsonDecode(userResponse.body);
+      print("articles: $articles");
       return {
         "userData": userData,
         "loginResponse": jsonDecode(response.body),

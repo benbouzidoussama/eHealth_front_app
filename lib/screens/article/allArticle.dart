@@ -55,7 +55,7 @@ class _AllArticleScreenState extends State<AllArticleScreen> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF2E7D32), Color(0xFF81C784)],
+              colors: [Colors.grey, Colors.white],
             ),
           ),
         ),
@@ -119,7 +119,7 @@ class _AllArticleScreenState extends State<AllArticleScreen> {
                       const Icon(
                         Icons.article_outlined,
                         size: 60,
-                        color: Color(0xFF2E7D32),
+                        color: Color(0xff575de3),
                       ),
                       const SizedBox(height: 16),
                       Text(
@@ -256,7 +256,7 @@ class _AllArticleScreenState extends State<AllArticleScreen> {
         icon: Icon(
           icon,
           size: 20,
-          color: onPressed != null ? const Color(0xFF2E7D32) : Colors.grey,
+          color: onPressed != null ? Color(0xff575de3) : Colors.grey,
         ),
         onPressed: onPressed,
       ),
@@ -276,7 +276,7 @@ class _AllArticleScreenState extends State<AllArticleScreen> {
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: isCurrentPage ? const Color(0xFF2E7D32) : Colors.white,
+          color: isCurrentPage ? Color(0xff575de3) : Colors.white,
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
@@ -310,31 +310,11 @@ String formatDate(String date) {
 class ArticleCard extends StatelessWidget {
   final Map<String, dynamic> article;
   final VoidCallback onTap;
-
   const ArticleCard({Key? key, required this.article, required this.onTap})
     : super(key: key);
-
-  // Fonction pour obtenir une couleur en fonction de la catégorie
-  Color getCategoryColor(String category) {
-    switch (category.toLowerCase()) {
-      case 'santé':
-        return Colors.blue;
-      case 'nutrition':
-        return Colors.green;
-      case 'fitness':
-        return Colors.orange;
-      case 'bien-être':
-        return Colors.purple;
-      default:
-        return Colors.teal;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final categoryColor = getCategoryColor(article['categorie']);
-
+    final double screenWidth = MediaQuery.of(context).size.width;   
     return Container(
       margin: EdgeInsets.symmetric(vertical: screenWidth * 0.02),
       decoration: BoxDecoration(
@@ -357,32 +337,64 @@ class ArticleCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Image de couverture (placeholder)
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(12),
                 ),
-                child: Container(
-                  height: 120,
-                  width: double.infinity,
-                  color: categoryColor.withOpacity(0.1),
-                  child: Stack(
-                    children: [
-                      Image(
-                        image: AssetImage('images/article.jpg'),
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                      ),
-                      Positioned(
-                        top: 10,
-                        right: 10,
-                        child: Container(
+                child:
+                    article['image'] != null
+                        ? Container(
+                          height:
+                              180, // Augmentation de la hauteur pour mieux voir l'image
+                          width: double.infinity,
+                          color: Color(0xff575de3).withOpacity(0.1),
+                          child: Image(
+                            image: NetworkImage(article['image']),
+                            fit:
+                                BoxFit.contain, // Changement de cover à contain
+                            width: double.infinity,
+                            errorBuilder: (context, error, stackTrace) {
+                              // Gestion des erreurs de chargement d'image
+                              return Container(
+                                height: 180,
+                                color: Color(0xff575de3).withOpacity(0.2),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.image_not_supported,
+                                    color: Colors.grey,
+                                    size: 40,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                        : const SizedBox.shrink(),
+              ),
+
+              // Contenu de l'article
+              Padding(
+                padding: EdgeInsets.all(screenWidth * 0.04),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          article['titre'],
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
                             vertical: 5,
                           ),
                           decoration: BoxDecoration(
-                            color: categoryColor.withOpacity(0.8),
+                            color: Color(0xff575de3).withOpacity(0.6),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
@@ -394,24 +406,7 @@ class ArticleCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Contenu de l'article
-              Padding(
-                padding: EdgeInsets.all(screenWidth * 0.04),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      article['titre'],
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      ],
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -428,7 +423,7 @@ class ArticleCard extends StatelessWidget {
                             try {
                               final apiService = ApiService();
                               final doctorData = await apiService
-                                  .fetchDoctorById(article['idDoctor']);
+                                  .fetchDoctorById(article['idDoctor']['_id']);
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -440,7 +435,7 @@ class ArticleCard extends StatelessWidget {
                               );
                             } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
+                                SnackBar(
                                   content: Text(
                                     'Erreur : Impossible de charger les données du docteur',
                                   ),
@@ -453,9 +448,12 @@ class ArticleCard extends StatelessWidget {
                               CircleAvatar(
                                 radius: screenWidth * 0.04,
                                 backgroundColor: Colors.grey[200],
-                                backgroundImage: const AssetImage(
-                                  'images/profil.jpeg',
-                                ),
+                                backgroundImage:
+                                    article['idDoctor']['image'] != null
+                                        ? NetworkImage(
+                                          article['idDoctor']['image'],
+                                        )
+                                        : AssetImage('images/avatar.jpg'),
                               ),
                               const SizedBox(width: 8),
                               Text(
@@ -463,7 +461,7 @@ class ArticleCard extends StatelessWidget {
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 14,
-                                  color: Color(0xFF2E7D32),
+                                  color: Color(0xff575de3),
                                 ),
                               ),
                             ],

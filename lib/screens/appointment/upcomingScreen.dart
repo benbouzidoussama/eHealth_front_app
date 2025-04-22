@@ -40,7 +40,6 @@ class _UpcomingScreenState extends State<UpcomingScreen> {
             return const Center(child: Text('Aucun rendez-vous à venir'));
           } else {
             final appointments = snapshot.data!;
-            print('Appointments $appointments');
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
               child: ListView.builder(

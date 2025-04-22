@@ -239,8 +239,11 @@ class DoctorCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircleAvatar(
-              backgroundImage: AssetImage('images/profil.jpeg'),
+            CircleAvatar(
+              backgroundImage:
+                  doctor['image'] != null
+                      ? NetworkImage(doctor['image'])
+                      : const AssetImage('images/avatar.jpg') as ImageProvider,
               radius: 35,
             ),
             const SizedBox(height: 10),

@@ -42,10 +42,11 @@ class ProfilScreen extends StatelessWidget {
                   backgroundColor: Colors.blueAccent,
                   child: CircleAvatar(
                     radius: 50,
-                    backgroundImage: NetworkImage(
-                      userData?["image"] ??
-                          "https://res.cloudinary.com/dvrhrdvps/image/upload/v1741181587/profile_pictures/ytl0zhqqkbnj2mllstyv.jpg",
-                    ),
+
+                    backgroundImage:
+                        userData?['image'] != null
+                            ? NetworkImage(userData?['image'])
+                            : AssetImage('images/avatar.jpg'),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -59,7 +60,7 @@ class ProfilScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'oussamabenbouzid159@gmail.com',
+                  userData?["email"] ?? "",
                   style: TextStyle(color: Colors.black, fontSize: 14),
                 ),
               ],

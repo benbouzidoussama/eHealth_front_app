@@ -1,10 +1,9 @@
 import 'package:e_health_front/providers/doctor_provider.dart';
+import 'package:e_health_front/screens/auth/welcomeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:e_health_front/providers/user_provider.dart';
 import 'package:e_health_front/providers/article_provider.dart';
-import 'package:e_health_front/screens/auth/loginScreen.dart';
-
 void main() {
   runApp(MyApp());
 }
@@ -22,7 +21,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'E-Health',
         theme: ThemeData(primarySwatch: Colors.blue),
-        home: LoginScreen(),
+        home: WelcomeScreen(),
       ),
     );
   }
