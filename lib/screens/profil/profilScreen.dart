@@ -1,3 +1,4 @@
+import 'package:e_health_front/providers/article_provider.dart';
 import 'package:e_health_front/screens/auth/loginScreen.dart';
 import 'package:e_health_front/screens/profil/UpdatePasswordByOldPasswordScreen.dart';
 import 'package:e_health_front/screens/profil/updateProfilScreen.dart';
@@ -7,7 +8,9 @@ import 'package:e_health_front/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
 class ProfilScreen extends StatelessWidget {
-  const ProfilScreen({super.key});
+  //final ApiService _apiService = ApiService(); // Define _apiService
+
+  ProfilScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -138,6 +141,17 @@ class ProfilScreen extends StatelessWidget {
                                     await apiService.logout();
                                     // Fermer le dialogue
                                     Navigator.of(context).pop();
+                                    // Réinitialiser le provider UserProvider
+                                    // et ArticleProvider
+                                    Provider.of<UserProvider>(
+                                      context,
+                                      listen: false,
+                                    ).clearUser();
+                                    Provider.of<ArticleProvider>(
+                                      context,
+                                      listen: false,
+                                    ).clearArticles();
+
                                     // Rediriger vers l'écran de connexion et effacer l'historique de navigation
                                     Navigator.of(context).pushAndRemoveUntil(
                                       MaterialPageRoute(

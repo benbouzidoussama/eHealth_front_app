@@ -417,7 +417,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       "role": "patient",
     };
 
-    print("Données utilisateur : $userData");
 
     final response = await _apiService.registerUser(userData);
 

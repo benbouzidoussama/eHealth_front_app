@@ -70,35 +70,48 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   }
 
   Future<void> _loadMessages() async {
+  setState(() {
+    _isLoading = true;
+  });
+  
+  try {
+    final messages = await _chatService.getMessages(widget.chatId);
     setState(() {
-      _isLoading = true;
+      _messages = messages;
+      _isLoading = false;
     });
     
-    try {
-      final messages = await _chatService.getMessages(widget.chatId);
-      setState(() {
-        _messages = messages;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load messages: $e')),
-      );
-    }
+    // Délai court pour s'assurer que le ListView est complètement rendu
+    Future.delayed(const Duration(milliseconds: 100), () {
+      _scrollToBottom();
+    });
+  } catch (e) {
+    setState(() {
+      _isLoading = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to load messages: $e')),
+    );
   }
+}
 
   void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
+  if (_scrollController.hasClients) {
+    try {
+      // Utilisez jumpTo pour un défilement instantané au lieu d'une animation
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      
+      // Pour être sûr, ajoutez un petit délai et essayez à nouveau
+      Future.delayed(const Duration(milliseconds: 50), () {
+        if (_scrollController.hasClients) {
+          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+        }
+      });
+    } catch (e) {
+      print("Erreur de défilement: $e");
     }
   }
+}
 
   String _formatTimestamp(String timestamp) {
     final DateTime dateTime = DateTime.parse(timestamp);

@@ -9,6 +9,10 @@ class ArticleProvider with ChangeNotifier {
     _articles = articles;
     notifyListeners();
   }
+  void clearArticles() {
+  _articles = [];
+  notifyListeners();
+}
   Map<String, dynamic> getArticleById(String articleId) {
     return _articles.firstWhere((article) => article['_id'] == articleId);
   }

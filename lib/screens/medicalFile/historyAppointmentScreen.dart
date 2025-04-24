@@ -1,3 +1,4 @@
+import 'package:e_health_front/screens/medicalFile/imageViewerScreen.dart';
 import 'package:e_health_front/screens/medicalFile/noteScreen.dart';
 import 'package:e_health_front/screens/medicalFile/ordonnanceScreen.dart';
 import 'package:e_health_front/screens/medicalFile/regimeScreen.dart';
@@ -344,6 +345,20 @@ class _HistoryAppointmentScreenState extends State<HistoryAppointmentScreen> {
               child: Column(
                 children:
                     appointment['documents'].map<Widget>((doc) {
+                      // Déterminer le type de fichier
+                      final String fileUrl = doc['file']?.toString() ?? '';
+                      final bool isImage =
+                          fileUrl.toLowerCase().contains('.jpg') ||
+                          fileUrl.toLowerCase().contains('.jpeg') ||
+                          fileUrl.toLowerCase().contains('.png') ||
+                          fileUrl.toLowerCase().contains('.gif') ||
+                          fileUrl.contains('/image/upload/');
+
+                      // Sélectionner l'icône appropriée
+                      final IconData fileIcon =
+                          isImage ? Icons.image : Icons.picture_as_pdf;
+                      final Color iconColor = isImage ? Colors.red : Colors.red;
+
                       return ListTile(
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -355,49 +370,15 @@ class _HistoryAppointmentScreenState extends State<HistoryAppointmentScreen> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(
-                            Icons.picture_as_pdf,
-                            color: Colors.red,
-                          ),
+                          child: Icon(fileIcon, color: iconColor),
                         ),
                         title: Text(
                           doc['title'] ?? '',
                           style: const TextStyle(fontWeight: FontWeight.w500),
                         ),
                         subtitle: Text(doc['description'] ?? ''),
-                        trailing: const Icon(
-                          Icons.download,
-                          color: Colors.grey,
-                        ),
 
-                        onTap: () {
-                          // Vérifier que doc['file'] existe et n'est pas vide
-                          if (doc['file'] != null &&
-                              doc['file'].toString().isNotEmpty) {
-                            debugPrint('URL du PDF: ${doc['file']}');
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (_) => PdfViewerScreen(
-                                      url:
-                                          "https://res.cloudinary.com/dvrhrdvps/raw/upload/v1744410681/documents/fqq8fbaybah68gipwxtr",
-                                      title: doc['title'] ?? 'Document',
-                                    ),
-                              ),
-                            );
-                          } else {
-                            // Afficher un message d'erreur si l'URL est manquante
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Lien vers le PDF manquant ou invalide',
-                                ),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          }
-                        },
+                        onTap: () => _openDocument(context, doc),
                       );
                     }).toList(),
               ),
@@ -430,6 +411,60 @@ class _HistoryAppointmentScreenState extends State<HistoryAppointmentScreen> {
         ],
       ),
     );
+  }
+
+  // Ajoutez cette fonction dans votre classe _HistoryAppointmentScreenState
+  void _openDocument(BuildContext context, Map<String, dynamic> doc) {
+    // Vérifier que doc['file'] existe et n'est pas vide
+    if (doc['file'] == null || doc['file'].toString().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Lien vers le fichier manquant ou invalide'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final String fileUrl = doc['file'].toString();
+    final String title = doc['title'] ?? 'Document';
+
+    debugPrint('URL du fichier: $fileUrl');
+
+    try {
+      // Détecter si c'est une image basé sur l'URL ou l'extension
+      bool isImage =
+          fileUrl.toLowerCase().contains('.jpg') ||
+          fileUrl.toLowerCase().contains('.jpeg') ||
+          fileUrl.toLowerCase().contains('.png') ||
+          fileUrl.toLowerCase().contains('.gif') ||
+          fileUrl.contains('/image/upload/');
+
+      if (isImage) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ImageViewerScreen(url: fileUrl, title: title),
+          ),
+        );
+      } else {
+        // Traiter comme PDF par défaut
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => PdfViewerScreen(url: fileUrl, title: title),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Erreur lors de l\'ouverture du document : $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors de l\'ouverture du document : $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   Widget _buildSectionWithNavigation(

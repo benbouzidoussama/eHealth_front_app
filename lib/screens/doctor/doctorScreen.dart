@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:e_health_front/screens/appointment/bookAppointment.dart';
 import 'package:e_health_front/screens/doctor/doctorProfilScreen.dart';
-import 'package:e_health_front/services/api_service.dart'; // Importer le service API
+import 'package:e_health_front/services/api_service.dart';
 
 class DoctorScreen extends StatefulWidget {
   const DoctorScreen({super.key});
@@ -15,8 +15,8 @@ class _DoctorScreenState extends State<DoctorScreen> {
   String selectedValue = 'tous';
   List<Map<String, dynamic>> allDoctors = [];
   List<Map<String, dynamic>> filteredDoctors = [];
-  bool isLoading = true;
-  final ApiService _apiService = ApiService(); // Instance du service API
+  final ApiService _apiService = ApiService();
+  late Future<List<Map<String, dynamic>>> _doctorsFuture;
 
   @override
   void initState() {
@@ -24,7 +24,7 @@ class _DoctorScreenState extends State<DoctorScreen> {
     _searchController.addListener(() {
       filterDoctors(_searchController.text);
     });
-    loadDoctors(selectedValue);
+    _doctorsFuture = _loadDoctors(selectedValue);
   }
 
   @override
@@ -34,11 +34,7 @@ class _DoctorScreenState extends State<DoctorScreen> {
   }
 
   // Charger les docteurs en fonction du type de filtre sélectionné
-  Future<void> loadDoctors(String filterType) async {
-    setState(() {
-      isLoading = true;
-    });
-
+  Future<List<Map<String, dynamic>>> _loadDoctors(String filterType) async {
     try {
       List<Map<String, dynamic>> doctors;
       if (filterType == 'tous') {
@@ -52,18 +48,12 @@ class _DoctorScreenState extends State<DoctorScreen> {
       setState(() {
         allDoctors = doctors;
         filterDoctors(_searchController.text);
-        isLoading = false;
       });
+      
+      return doctors;
     } catch (e) {
-      setState(() {
-        isLoading = false;
-        allDoctors = [];
-        filteredDoctors = [];
-      });
-      // Gérer l'erreur - afficher un snackbar ou une boîte de dialogue
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erreur: ${e.toString()}')));
+      // Propager l'erreur pour que FutureBuilder puisse la gérer
+      throw e;
     }
   }
 
@@ -73,23 +63,25 @@ class _DoctorScreenState extends State<DoctorScreen> {
       if (searchText.isEmpty) {
         filteredDoctors = List.from(allDoctors);
       } else {
-        filteredDoctors =
-            allDoctors.where((doctor) {
-              final firstName =
-                  doctor['firstName']?.toString().toLowerCase() ?? '';
-              final lastName =
-                  doctor['lastName']?.toString().toLowerCase() ?? '';
-              final speciality =
-                  doctor['speciality']?.toString().toLowerCase() ?? '';
-              final fullName = '$firstName $lastName'.toLowerCase();
-              final query = searchText.toLowerCase();
+        filteredDoctors = allDoctors.where((doctor) {
+          final firstName = doctor['firstName']?.toString().toLowerCase() ?? '';
+          final lastName = doctor['lastName']?.toString().toLowerCase() ?? '';
+          final speciality = doctor['speciality']?.toString().toLowerCase() ?? '';
+          final fullName = '$firstName $lastName'.toLowerCase();
+          final query = searchText.toLowerCase();
 
-              return firstName.contains(query) ||
-                  lastName.contains(query) ||
-                  fullName.contains(query) ||
-                  speciality.contains(query);
-            }).toList();
+          return firstName.contains(query) ||
+              lastName.contains(query) ||
+              fullName.contains(query) ||
+              speciality.contains(query);
+        }).toList();
       }
+    });
+  }
+
+  void _refreshDoctors() {
+    setState(() {
+      _doctorsFuture = _loadDoctors(selectedValue);
     });
   }
 
@@ -141,8 +133,8 @@ class _DoctorScreenState extends State<DoctorScreen> {
                     if (newValue != null && newValue != selectedValue) {
                       setState(() {
                         selectedValue = newValue;
+                        _doctorsFuture = _loadDoctors(newValue);
                       });
-                      loadDoctors(newValue);
                     }
                   },
                 ),
@@ -164,12 +156,32 @@ class _DoctorScreenState extends State<DoctorScreen> {
             ),
             const SizedBox(height: 10),
             Expanded(
-              child:
-                  isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : filteredDoctors.isEmpty
-                      ? const Center(child: Text('Aucun docteur trouvé'))
-                      : DoctorGrid(doctors: filteredDoctors),
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: _doctorsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Erreur: ${snapshot.error}'),
+                          const SizedBox(height: 10),
+                          ElevatedButton(
+                            onPressed: _refreshDoctors,
+                            child: const Text('Réessayer'),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else if (!snapshot.hasData || filteredDoctors.isEmpty) {
+                    return const Center(child: Text('Aucun docteur trouvé'));
+                  } else {
+                    return DoctorGrid(doctors: filteredDoctors);
+                  }
+                },
+              ),
             ),
           ],
         ),
@@ -201,8 +213,7 @@ class DoctorGrid extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder:
-                    (context) => DoctorProfilScreen(doctor: doctors[index]),
+                builder: (context) => DoctorProfilScreen(doctor: doctors[index]),
               ),
             );
           },
@@ -240,10 +251,9 @@ class DoctorCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircleAvatar(
-              backgroundImage:
-                  doctor['image'] != null
-                      ? NetworkImage(doctor['image'])
-                      : const AssetImage('images/avatar.jpg') as ImageProvider,
+              backgroundImage: doctor['image'] != null
+                  ? NetworkImage(doctor['image'])
+                  : const AssetImage('images/avatar.jpg') as ImageProvider,
               radius: 35,
             ),
             const SizedBox(height: 10),

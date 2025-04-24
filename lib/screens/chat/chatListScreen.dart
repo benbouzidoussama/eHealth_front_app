@@ -79,29 +79,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
               });
             },
           ),
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
-            onSelected: (value) {
-              // Handle menu options
-              if (value == 'refresh') {
-                _refreshChats();
-              }
-            },
-            itemBuilder: (BuildContext context) {
-              return [
-                const PopupMenuItem<String>(
-                  value: 'refresh',
-                  child: Row(
-                    children: [
-                      Icon(Icons.refresh, size: 20),
-                      SizedBox(width: 10),
-                      Text('Refresh'),
-                    ],
-                  ),
-                ),
-              ];
-            },
-          ),
         ],
       ),
       body: RefreshIndicator(

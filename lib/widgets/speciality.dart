@@ -1,3 +1,4 @@
+import 'package:e_health_front/screens/speciality/DoctorsBySpecialityScreen.dart';
 import 'package:flutter/material.dart';
 import '../screens/styles/colors.dart'; // Importez les couleurs si nécessaire
 
@@ -13,7 +14,16 @@ class SpecialitiesList extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemCount: specialities.length,
         itemBuilder: (context, index) {
-          return SpecialityCard(speciality: specialities[index], onTap: () {});
+          return SpecialityCard(speciality: specialities[index], onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) =>
+                    DoctorsBySpecialityScreen(specialityName: specialities[index].name),
+          ),
+        );
+      },);
         },
       ),
     );

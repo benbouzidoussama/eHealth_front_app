@@ -1,4 +1,5 @@
 import 'package:e_health_front/screens/appointment/updateAppointmentScreen.dart';
+import 'package:e_health_front/screens/doctor/doctorProfilScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:e_health_front/services/api_service.dart';
 
@@ -83,6 +84,30 @@ class _UpcomingScreenState extends State<UpcomingScreen> {
                                         : AssetImage('images/avatar.jpg'),
                                 radius: 35,
                               ),
+                              onTap: () async {
+                                try {
+                                  final apiService = ApiService();
+                                  final doctorData = await apiService
+                                      .fetchDoctorById(doctor['_id']);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => DoctorProfilScreen(
+                                            doctor: doctorData,
+                                          ),
+                                    ),
+                                  );
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Erreur : Impossible de charger les données du docteur',
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
                             ),
                             const Padding(
                               padding: EdgeInsets.symmetric(horizontal: 15),
@@ -155,7 +180,75 @@ class _UpcomingScreenState extends State<UpcomingScreen> {
                               children: [
                                 InkWell(
                                   onTap: () async {
-                                    // Logique pour annuler un rendez-vous
+                                    // Afficher une boîte de dialogue de confirmation
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text('Confirmation'),
+                                          content: const Text(
+                                            'Êtes-vous sûr de vouloir annuler ce rendez-vous?',
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(
+                                                  context,
+                                                ).pop(); // Fermer la boîte de dialogue
+                                              },
+                                              child: const Text('Non'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () async {
+                                                // Fermer la boîte de dialogue
+                                                Navigator.of(context).pop();
+
+                                                try {
+                                                  // Appeler la fonction pour mettre à jour le statut
+                                                  await _apiService
+                                                      .updateAppointmentStatus(
+                                                        appointment['_id'],
+                                                        "canceled",
+                                                      );
+
+                                                  // Afficher un message de succès
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                        'Rendez-vous annulé avec succès',
+                                                      ),
+                                                      backgroundColor:
+                                                          Colors.green,
+                                                    ),
+                                                  );
+
+                                                  // Rafraîchir la liste des rendez-vous
+                                                  setState(() {
+                                                    // Cela va déclencher le FutureBuilder pour se rafraîchir
+                                                  });
+                                                } catch (e) {
+                                                  // Afficher un message d'erreur
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        'Erreur lors de l\'annulation du rendez-vous: ${e.toString()}',
+                                                      ),
+                                                      backgroundColor:
+                                                          Colors.red,
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                              child: const Text('Oui'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
                                   },
                                   child: Container(
                                     width: 150,

@@ -81,7 +81,6 @@ class ApiService {
         headers: {"Content-Type": "application/json"},
       );
       final userData = jsonDecode(userResponse.body);
-      print("articles: $articles");
       return {
         "userData": userData,
         "loginResponse": jsonDecode(response.body),
@@ -604,7 +603,6 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      print(data);
       return data.cast<Map<String, dynamic>>();
     } else {
       throw Exception('Erreur de chargement des docteurs : ${response.body}');
@@ -649,4 +647,21 @@ class ApiService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('token'); // Supprime le token
   }
+
+  
+  Future<bool> isUserLoggedIn() async {
+  await loadToken();
+  // Vérifier si le token existe
+  if (token == null || token!.isEmpty) {
+    return false;
+  }
+  // Vérifier si le token est valide (non expiré)
+  try {
+    bool isExpired = JwtDecoder.isExpired(token!);
+    return !isExpired;
+  } catch (e) {
+    return false;
+  }
+}
+
 }

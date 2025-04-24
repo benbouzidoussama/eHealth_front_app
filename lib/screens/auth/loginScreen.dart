@@ -37,31 +37,29 @@ class _LoginScreenState extends State<LoginScreen> {
     final userData=responseData["userData"];
     
 
-    if (loginResponse != null && loginResponse["accessToken"] != null) {
-      print("Connexion réussie : ${loginResponse['accessToken']}");
+    // Après la connexion réussie dans la méthode _loginUser()
+if (loginResponse != null && loginResponse["accessToken"] != null) {
+  print("Connexion réussie : ${loginResponse['accessToken']}");
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Connexion réussie")));
-      
-      // Stocker les informations de l'utilisateur
-      Provider.of<UserProvider>(context, listen: false).setUser(userData);
-      // Stocker les articles
-      if (articlesResponse != null) {
-        Provider.of<ArticleProvider>(
-          context,
-          listen: false,
-        ).setArticles(List<Map<String, dynamic>>.from(articlesResponse));
-      }
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text("Connexion réussie"))
+  );
+  
+  // Stocker les informations de l'utilisateur
+  Provider.of<UserProvider>(context, listen: false).setUser(userData);
+  
+  // Stocker les articles
+  if (articlesResponse != null) {
+    Provider.of<ArticleProvider>(context, listen: false)
+      .setArticles(List<Map<String, dynamic>>.from(articlesResponse));
+  }
 
-      // Navigation vers la page principale
-      Navigator.push(context, MaterialPageRoute(builder: (_) => Navigation()));
-    } else {
-      print("Échec de la connexion");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Email ou mot de passe invalide")));
-    }
+  // Navigation vers la page principale avec remplacement pour éviter de revenir au login
+  Navigator.pushReplacement(
+    context, 
+    MaterialPageRoute(builder: (_) => Navigation())
+  );
+}
   }
 
   @override
@@ -105,14 +103,14 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             TextSpan(
-                              text: 'l',
+                              text: 'e',
                               style: TextStyle(
                                 color: Colors.blue,
                                 fontSize: 30,
                               ),
                             ),
                             TextSpan(
-                              text: 'eat',
+                              text: 'alt',
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 30,

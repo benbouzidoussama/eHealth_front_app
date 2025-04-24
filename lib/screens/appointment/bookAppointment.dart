@@ -314,6 +314,52 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           shape: BoxShape.circle,
         ),
       ),
+      locale: 'fr_FR',
+      // Configuration personnalisée pour les jours et mois en français
+      daysOfWeekVisible: true,
+      startingDayOfWeek: StartingDayOfWeek.monday,
+      // Vous pouvez personnaliser le formatage des titres
+      headerVisible: true,
+      calendarBuilders: CalendarBuilders(
+        // Vous pouvez personnaliser l'affichage du titre du mois
+        headerTitleBuilder: (context, day) {
+          final frenchMonths = [
+            'Janvier',
+            'Février',
+            'Mars',
+            'Avril',
+            'Mai',
+            'Juin',
+            'Juillet',
+            'Août',
+            'Septembre',
+            'Octobre',
+            'Novembre',
+            'Décembre',
+          ];
+          return Center(
+            child: Text(
+              '${frenchMonths[day.month - 1]} ${day.year}',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          );
+        },
+        // Vous pouvez personnaliser l'affichage des jours de la semaine
+        dowBuilder: (context, day) {
+          final frenchDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+          // Convertir la date en jour de la semaine (1 = lundi, 7 = dimanche)
+          final dayIndex = day.weekday - 1;
+          return Center(
+            child: Text(
+              frenchDays[dayIndex],
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 

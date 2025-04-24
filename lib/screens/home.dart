@@ -38,10 +38,10 @@ class HomeScreen extends StatelessWidget {
         title: Row(
           children: [
             CircleAvatar(
-              backgroundImage: NetworkImage(
-                userData?["image"] ??
-                    "https://www.pngall.com/wp-content/uploads/5/Avatar-Profile-PNG-Clipart.png",
-              ),
+              backgroundImage:
+                  userData?['image'] != null
+                      ? NetworkImage(userData?['image'])
+                      : AssetImage('images/avatar.jpg'),
             ),
             SizedBox(width: 10),
             Column(
@@ -113,6 +113,9 @@ class HomeScreen extends StatelessWidget {
                             width: MediaQuery.of(context).size.width * 0.9,
                             child: AppointmentCard(
                               onTap: () {},
+                              image: doctor['image'] != null
+                                  ? NetworkImage(doctor['image'])
+                                  : AssetImage('images/avatar.jpg'),
                               name: doctor['doctorName'] ?? 'Inconnu',
                               speciality:
                                   doctor['speciality'] ?? 'Non spécifié',
@@ -286,8 +289,10 @@ class AppointmentCard extends StatelessWidget {
   final String dateDay;
   final String dateTime;
   final String type;
+  final ImageProvider image;
   const AppointmentCard({
     Key? key,
+    required this.image,
     required this.onTap,
     required this.speciality,
     required this.dateDay,
@@ -317,7 +322,10 @@ class AppointmentCard extends StatelessWidget {
                     Row(
                       children: [
                         CircleAvatar(
-                          backgroundImage: AssetImage('images/profil.jpeg'),
+                          backgroundImage:image,
+                                    // doctor['image'] != null
+                                    //     ? NetworkImage(doctor['image'])
+                                    //     : AssetImage('images/avatar.jpg'),
                         ),
                         SizedBox(width: 10),
                         Column(

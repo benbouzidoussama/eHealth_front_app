@@ -1,3 +1,4 @@
+import 'package:e_health_front/screens/doctor/doctorProfilScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:e_health_front/services/api_service.dart';
 
@@ -87,6 +88,30 @@ class _CanceledScreenState extends State<CanceledScreen> {
                                         : AssetImage('images/avatar.jpg'),
                                 radius: 35,
                               ),
+                              onTap: () async {
+                                try {
+                                  final apiService = ApiService();
+                                  final doctorData = await apiService
+                                      .fetchDoctorById(doctor['_id']);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => DoctorProfilScreen(
+                                            doctor: doctorData,
+                                          ),
+                                    ),
+                                  );
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Erreur : Impossible de charger les données du docteur',
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
                             ),
                             const Padding(
                               padding: EdgeInsets.symmetric(horizontal: 15),
