@@ -1,5 +1,6 @@
 import 'package:e_health_front/providers/article_provider.dart';
 import 'package:e_health_front/screens/auth/loginScreen.dart';
+import 'package:e_health_front/screens/notification/notifications_screen.dart';
 import 'package:e_health_front/screens/profil/UpdatePasswordByOldPasswordScreen.dart';
 import 'package:e_health_front/screens/profil/updateProfilScreen.dart';
 import 'package:e_health_front/services/api_service.dart';
@@ -109,8 +110,15 @@ class ProfilScreen extends StatelessWidget {
                     Icons.notifications,
                     'Notifications',
                     context,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NotificationsScreen(),
+                        ),
+                      );
+                    },
                   ),
-                  _buildSettingsItem(Icons.language, 'Langue', context),
                   _buildSettingsItem(Icons.info, 'À propos', context),
                   _buildSettingsItem(
                     Icons.logout,

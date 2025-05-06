@@ -3,12 +3,14 @@ import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+import 'chat_service.dart'; // Make sure to import the ChatService
 
 class ApiService {
-  final String baseUrl = "http://10.0.2.2:3000/api";
-  //final String baseUrl = "http://localhost:3000/api";
+  //final String baseUrl = "http://10.0.2.2:3000/api";
+  final String baseUrl = "http://localhost:3000/api";
 
   String? token;
+  final ChatService _chatService = ChatService(); // Create ChatService instance
 
   Future<http.Response> registerUser(Map<String, dynamic> userData) async {
     final String url = '$baseUrl/auth/register';
@@ -20,7 +22,7 @@ class ApiService {
     return response;
   }
 
-  // Connexion de l'utilisateur
+  // Connexion de l'utilisateur with chat integration
   Future<Map<String, dynamic>> loginUser(Map<String, String> loginData) async {
     final String url = '$baseUrl/auth/login';
 
@@ -33,14 +35,36 @@ class ApiService {
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
       token = responseBody["accessToken"];
-      //await loadToken(); // Charger le token avant d'utiliser JwtDecoder
-      // Vérifier si le token est défini
-      if (token == null) {
-        throw Exception("Token non défini");
-      }
+
       // Sauvegarder le token
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString("token", token!);
+
+      // Initialize socket connection and notifications
+      await _chatService.initializeNotifications();
+      await _chatService.initializeSocket();
+
+      // Get all user chats and join them
+      try {
+        List<dynamic> chats = await _chatService.getChats();
+        for (var chat in chats) {
+          String chatId = chat['_id'];
+          _chatService.joinChat(chatId);
+
+          // Set up message listener for each chat
+          _chatService.listenForMessages(chatId, (message) {
+            // This callback will be executed when new messages arrive
+            // You might want to update this based on your app's architecture
+            print(
+              "New message received in chat $chatId: ${message['content']}",
+            );
+          });
+        }
+      } catch (e) {
+        print("Error initializing chats: $e");
+        // Continue login process even if chat initialization fails
+      }
+
       // Récupération des articles
       final articlesResponse = await http.get(
         Uri.parse('$baseUrl/articles'),
@@ -48,6 +72,7 @@ class ApiService {
       );
 
       List<dynamic> articles = jsonDecode(articlesResponse.body);
+      articles = articles.reversed.toList();
       // Ajouter le nom du docteur à chaque article
       for (int i = 0; i < articles.length; i++) {
         final doctorId = articles[i]['idDoctor'];
@@ -85,6 +110,7 @@ class ApiService {
         "userData": userData,
         "loginResponse": jsonDecode(response.body),
         "articlesResponse": articles, // Use the modified articles list
+        "chats": await _chatService.getChats(), // Add chats to the response
       };
     } else {
       // Échec de l'authentification, on retourne seulement cette réponse
@@ -92,6 +118,7 @@ class ApiService {
         "loginResponse": jsonDecode(response.body),
         "articlesResponse": null,
         "userData": null,
+        "chats": null,
       };
     }
   }
@@ -182,10 +209,6 @@ class ApiService {
 
   // Charger le token depuis SharedPreferences
   Future<void> loadToken() async {
-    // if (token != null) {
-    //   SharedPreferences prefs = await SharedPreferences.getInstance();
-    //   await prefs.setString("token", token!);
-    // }
     return SharedPreferences.getInstance().then((prefs) {
       token = prefs.getString("token");
     });
@@ -252,6 +275,57 @@ class ApiService {
       return doctorData;
     } else {
       throw Exception('Failed to fetch doctor data');
+    }
+  }
+
+  Future<List<dynamic>> getNotifications(String token) async {
+    final url = Uri.parse('$baseUrl/notifications');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    token = prefs.getString('token') ?? token;
+    if (token == null) {
+      throw Exception("Token non défini");
+    }
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      return data['notifications'];
+    } else {
+      throw Exception('Erreur lors de la récupération des notifications');
+    }
+  }
+
+  Future<bool> markNotificationAsRead(String notificationId) async {
+    final url = Uri.parse('$baseUrl/notifications/$notificationId/read');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    token = prefs.getString('token') ?? token;
+    if (token == null) {
+      throw Exception("Token non défini");
+    }
+    final response = await http.put(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else if (response.statusCode == 404) {
+      print('Notification introuvable ou n’appartient pas à l’utilisateur.');
+      return false;
+    } else {
+      print('Erreur (${response.statusCode}): ${response.body}');
+      throw Exception('Erreur lors du marquage de la notification comme lue');
     }
   }
 
@@ -475,7 +549,7 @@ class ApiService {
 
       return detailedAppointments;
     } catch (e) {
-      ("Erreur dans getAllAppointmentDetails: $e");
+      print("Erreur dans getAllAppointmentDetails: $e");
       rethrow;
     }
   }
@@ -643,25 +717,129 @@ class ApiService {
     }
   }
 
+  // Get user chats
+  Future<List<Map<String, dynamic>>> getUserChats() async {
+    try {
+      List<dynamic> chats = await _chatService.getChats();
+      return chats.map((chat) => chat as Map<String, dynamic>).toList();
+    } catch (e) {
+      print("Error getting user chats: $e");
+      throw Exception('Failed to load chats');
+    }
+  }
+
+  // Create a chat with a doctor
+  Future<Map<String, dynamic>> createChatWithDoctor(String doctorId) async {
+    try {
+      final response = await _chatService.createChat(doctorId: doctorId);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Chat created successfully
+        Map<String, dynamic> chatData = jsonDecode(response.body);
+
+        // Join the new chat
+        _chatService.joinChat(chatData['_id']);
+
+        // Set up listener for the new chat
+        _chatService.listenForMessages(chatData['_id'], (message) {
+          print(
+            "New message received in chat ${chatData['_id']}: ${message['content']}",
+          );
+        });
+
+        return chatData;
+      } else {
+        throw Exception('Failed to create chat: ${response.body}');
+      }
+    } catch (e) {
+      print("Error creating chat with doctor: $e");
+      throw Exception('Error creating chat');
+    }
+  }
+
+  // Send text message
+  Future<bool> sendTextMessage({
+    required String chatId,
+    required String content,
+  }) async {
+    await loadToken();
+    if (token == null) {
+      throw Exception("Token non défini");
+    }
+
+    try {
+      final response = await _chatService.sendTextMessage(
+        token: token!,
+        chatId: chatId,
+        content: content,
+      );
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      print("Error sending text message: $e");
+      return false;
+    }
+  }
+
+  // Send image message
+  Future<bool> sendImageMessage({
+    required String chatId,
+    required File imageFile,
+  }) async {
+    await loadToken();
+    if (token == null) {
+      throw Exception("Token non défini");
+    }
+
+    try {
+      final response = await _chatService.sendImageMessage(
+        token: token!,
+        chatId: chatId,
+        imageFile: imageFile,
+      );
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      print("Error sending image message: $e");
+      return false;
+    }
+  }
+
+  // Get chat messages
+  Future<List<Map<String, dynamic>>> getChatMessages(String chatId) async {
+    try {
+      List<dynamic> messages = await _chatService.getMessages(chatId);
+      return messages
+          .map((message) => message as Map<String, dynamic>)
+          .toList();
+    } catch (e) {
+      print("Error getting chat messages: $e");
+      throw Exception('Failed to load messages');
+    }
+  }
+
   Future<void> logout() async {
+    // Disconnect from socket
+    _chatService.disconnect();
+
+    // Clear token
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('token'); // Supprime le token
+    token = null;
   }
 
-  
   Future<bool> isUserLoggedIn() async {
-  await loadToken();
-  // Vérifier si le token existe
-  if (token == null || token!.isEmpty) {
-    return false;
+    await loadToken();
+    // Vérifier si le token existe
+    if (token == null || token!.isEmpty) {
+      return false;
+    }
+    // Vérifier si le token est valide (non expiré)
+    try {
+      bool isExpired = JwtDecoder.isExpired(token!);
+      return !isExpired;
+    } catch (e) {
+      return false;
+    }
   }
-  // Vérifier si le token est valide (non expiré)
-  try {
-    bool isExpired = JwtDecoder.isExpired(token!);
-    return !isExpired;
-  } catch (e) {
-    return false;
-  }
-}
-
 }

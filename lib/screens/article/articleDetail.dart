@@ -1,4 +1,5 @@
 import 'package:e_health_front/screens/doctor/doctorProfilScreen.dart';
+import 'package:e_health_front/screens/medicalFile/imageViewerScreen.dart';
 import 'package:e_health_front/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:e_health_front/providers/article_provider.dart';
@@ -34,15 +35,31 @@ class ArticleDetailScreen extends StatelessWidget {
                   if (article['image'] != null)
                     Image.network(article['image'], fit: BoxFit.cover),
                   // Dégradé pour améliorer la lisibilité
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          Colors.black.withOpacity(0.5),
-                        ],
+                  GestureDetector(
+                    onTap: () {
+                      if (article['image'] != null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (_) => ImageViewerScreen(
+                                  url: article['image'],
+                                  title: "Image",
+                                ),
+                          ),
+                        );
+                      }
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withOpacity(0.5),
+                          ],
+                        ),
                       ),
                     ),
                   ),

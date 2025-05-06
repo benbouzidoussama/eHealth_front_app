@@ -314,7 +314,7 @@ class ArticleCard extends StatelessWidget {
     : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;   
+    final double screenWidth = MediaQuery.of(context).size.width;
     return Container(
       margin: EdgeInsets.symmetric(vertical: screenWidth * 0.02),
       decoration: BoxDecoration(
@@ -374,7 +374,7 @@ class ArticleCard extends StatelessWidget {
 
               // Contenu de l'article
               Padding(
-                padding: EdgeInsets.all(screenWidth * 0.04),
+                padding: EdgeInsets.symmetric(vertical: screenWidth * 0.03),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

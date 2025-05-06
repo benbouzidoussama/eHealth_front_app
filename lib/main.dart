@@ -1,10 +1,13 @@
 import 'package:e_health_front/screens/splashScreen.dart';
+import 'package:e_health_front/services/chat_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:e_health_front/providers/user_provider.dart';
 import 'package:e_health_front/providers/article_provider.dart';
 
-void main() {
+void main()async {
+  WidgetsFlutterBinding.ensureInitialized(); // <== AJOUTER CECI
+  await ChatService().initializeNotifications();
   runApp(
     MultiProvider(
       providers: [

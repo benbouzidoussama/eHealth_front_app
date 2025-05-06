@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
+import 'package:e_health_front/services/api_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:mime/mime.dart';
@@ -7,56 +9,93 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class ChatService {
-  //final String baseUrl = "http://localhost:3000/api";
-  //final String socketUrl = "http://localhost:3000";
-  final String baseUrl = "http://10.0.2.2:3000/api";
-  final String socketUrl = "http://10.0.2.2:3000";
-  
+  final String baseUrl = "http://localhost:3000/api";
+  final String socketUrl = "http://localhost:3000";
+  //final String baseUrl = "http://10.0.2.2:3000/api";
+  //final String socketUrl = "http://10.0.2.2:3000";
+
   IO.Socket? socket;
-  
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  Future<void> initializeNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
+
   // Singleton pattern
   static final ChatService _instance = ChatService._internal();
-  
+
   factory ChatService() {
     return _instance;
   }
-  
+
   ChatService._internal();
-  
+
   // Initialize socket connection
   Future<void> initializeSocket() async {
+    initializeNotifications();
     if (socket != null) {
       return; // Already initialized
     }
-    
+
     final token = await getToken();
     if (token == null) {
       throw Exception('No authentication token found');
     }
-    
+
     socket = IO.io(socketUrl, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
-      'extraHeaders': {'Authorization': 'Bearer $token'}
+      'extraHeaders': {'Authorization': 'Bearer $token'},
     });
-    
+
     socket!.connect();
-    
+
     socket!.onConnect((_) {
       print('Socket connected');
     });
-    
+
     socket!.onDisconnect((_) {
       print('Socket disconnected');
     });
-    
+
     socket!.onError((error) {
       print('Socket error: $error');
     });
   }
-  
+
+  Future<void> showNotification(String title, String body) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+          'chat_channel',
+          'Chat Messages',
+          channelDescription: 'Notifications for new chat messages',
+          importance: Importance.max,
+          priority: Priority.high,
+          ticker: 'ticker',
+        );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    );
+
+    await flutterLocalNotificationsPlugin.show(
+      0, // Notification ID
+      title,
+      body,
+      platformChannelSpecifics,
+    );
+  }
+
   // Join a specific chat room
   void joinChat(String chatId) {
     if (socket == null || !socket!.connected) {
@@ -67,14 +106,14 @@ class ChatService {
       socket!.emit('joinChat', chatId);
     }
   }
-  
+
   // Leave a specific chat room
   void leaveChat(String chatId) {
     if (socket != null && socket!.connected) {
       socket!.emit('leaveChat', chatId);
     }
   }
-  
+
   // Listen for new messages in a specific chat
   void listenForMessages(String chatId, Function(dynamic) onNewMessage) {
     if (socket == null) {
@@ -85,23 +124,46 @@ class ChatService {
       _setupMessageListener(chatId, onNewMessage);
     }
   }
-  
-  void _setupMessageListener(String chatId, Function(dynamic) onNewMessage) {
-    socket!.on('newMessage', (data) {
-      // Check if the message belongs to the current chat
+
+  void _setupMessageListener(
+    String chatId,
+    Function(dynamic) onNewMessage,
+  ) async {
+    socket!.on('newMessage', (data) async {
       if (data['chat'] == chatId) {
         onNewMessage(data);
+        final token = await getToken();
+        Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
+        if (data['sender'] != decodedToken["id"]) {
+          ApiService apiService = ApiService();
+          final doctor = await apiService.fetchDoctorById(data['sender']);
+          if (data['type'] == 'image') {
+            showNotification(
+              "${doctor['firstName']} ${doctor['lastName']}",
+              "Image reçue",
+            );
+          } else if (data['type'] == 'text') {
+            showNotification(
+              "${doctor['firstName']} ${doctor['lastName']}",
+              data['content'] ?? "Message reçu",
+            );
+          }
+          showNotification(
+            "${doctor['firstName']} ${doctor['lastName']}",
+            data['content'] ?? "Message reçu",
+          );
+        }
       }
     });
   }
-  
+
   // Stop listening for messages
   void stopListening() {
     if (socket != null) {
       socket!.off('newMessage');
     }
   }
-  
+
   // Disconnect socket
   void disconnect() {
     if (socket != null) {
@@ -192,15 +254,13 @@ class ChatService {
     final streamedResponse = await request.send();
     return await http.Response.fromStream(streamedResponse);
   }
-  
-  Future<http.Response> createChat({
-    required String doctorId,
-  }) async {
+
+  Future<http.Response> createChat({required String doctorId}) async {
     final token = await getToken();
     if (token == null) {
       throw Exception('No authentication token found');
     }
-    
+
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
     // Récupérer l'ID utilisateur
     String patientId = decodedToken["id"] ?? "ID non trouvé";
@@ -213,12 +273,27 @@ class ChatService {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
       },
-      body: jsonEncode({
-        'doctorId': doctorId,
-        'patientId': patientId,
-      }),
+      body: jsonEncode({'doctorId': doctorId, 'patientId': patientId}),
     );
 
     return response;
   }
+
+  Future<String?> getDoctorIdByChatId(String chatId) async {
+  try {
+    final token = await getToken();
+    final chats = await getChats();
+
+    for (var chat in chats) {
+      if (chat['_id'] == chatId) {
+        return chat['doctor']['_id'];
+      }
+    }
+    return null;
+  } catch (e) {
+    print('Erreur lors de la récupération du doctorId : $e');
+    return null;
+  }
+}
+
 }
