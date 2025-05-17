@@ -1,3 +1,4 @@
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:e_health_front/widgets/bezierContainer.dart';
 import '../../services/api_service.dart';
@@ -120,7 +121,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               gradient: LinearGradient(
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
-                                colors: [Colors.blue, Colors.lightBlue],
+                                colors: [
+                                  Color(MyColors.color2),
+                                  Color(MyColors.color2),
+                                ],
                               ),
                             ),
                             child: ElevatedButton(
@@ -165,7 +169,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         child: Text(
                           'Retour à la connexion',
                           style: TextStyle(
-                            color: Color(0xFF0389F6),
+                            color: Color(MyColors.color2) /*Color(0xFF0389F6)*/,
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                           ),
@@ -186,13 +190,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 10),
                     child: Row(
                       children: <Widget>[
-                        Icon(Icons.keyboard_arrow_left, color: Colors.black),
-                        Text(
-                          'Retour',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        Icon(
+                          Icons.keyboard_arrow_left,
+                          color: Colors.black,
+                          size: 30,
                         ),
                       ],
                     ),

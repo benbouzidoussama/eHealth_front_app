@@ -1,5 +1,6 @@
 import 'package:e_health_front/screens/appointment/updateAppointmentScreen.dart';
 import 'package:e_health_front/screens/doctor/doctorProfilScreen.dart';
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:e_health_front/services/api_service.dart';
 
@@ -23,6 +24,66 @@ class _ConfirmedScreenState extends State<ConfirmedScreen> {
 
   @override
   Widget build(BuildContext context) {
+    void _showSuccessDialog(String message) {
+      showDialog(
+        context: context,
+        barrierDismissible:
+            false, // Empêche de fermer le dialogue en cliquant à l'extérieur
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            backgroundColor: Colors.white,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Icône animée
+                Icon(Icons.check_circle, color: Colors.green, size: 80),
+                const SizedBox(height: 20),
+                // Message de succès
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              Center(
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: Color(
+                      MyColors.color2,
+                    ) /*Color(0xFF4880D8)*/,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Fermer le dialogue
+                  },
+                  child: Text(
+                    "OK",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 224, 221, 221),
       body: FutureBuilder<List<Map<String, dynamic>>>(
@@ -38,7 +99,7 @@ class _ConfirmedScreenState extends State<ConfirmedScreen> {
               ),
             );
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Aucun rendez-vous confirmés'));
+            return const Center(child: Text('Aucun rendez-vous confirmé'));
           } else {
             final appointments = snapshot.data!;
             return Padding(
@@ -165,7 +226,11 @@ class _ConfirmedScreenState extends State<ConfirmedScreen> {
                                     ),
                                     const SizedBox(width: 5),
                                     Text(
-                                      appointment['status'],
+                                      appointment['status'] == 'confirmed'
+                                          ? 'confirmé'
+                                          : appointment['status'] == 'pending'
+                                          ? 'en attente'
+                                          : 'annulé',
                                       style: const TextStyle(
                                         color: Colors.black54,
                                       ),
@@ -203,45 +268,19 @@ class _ConfirmedScreenState extends State<ConfirmedScreen> {
                                                 // Fermer la boîte de dialogue
                                                 Navigator.of(context).pop();
 
-                                                try {
-                                                  // Appeler la fonction pour mettre à jour le statut
-                                                  await _apiService
-                                                      .updateAppointmentStatus(
-                                                        appointment['_id'],
-                                                        "canceled",
-                                                      );
-
-                                                  // Afficher un message de succès
-                                                  ScaffoldMessenger.of(
-                                                    context,
-                                                  ).showSnackBar(
-                                                    const SnackBar(
-                                                      content: Text(
-                                                        'Rendez-vous annulé avec succès',
-                                                      ),
-                                                      backgroundColor:
-                                                          Colors.green,
-                                                    ),
-                                                  );
-
-                                                  // Rafraîchir la liste des rendez-vous
-                                                  setState(() {
-                                                    // Cela va déclencher le FutureBuilder pour se rafraîchir
-                                                  });
-                                                } catch (e) {
-                                                  // Afficher un message d'erreur
-                                                  ScaffoldMessenger.of(
-                                                    context,
-                                                  ).showSnackBar(
-                                                    SnackBar(
-                                                      content: Text(
-                                                        'Erreur lors de l\'annulation du rendez-vous: ${e.toString()}',
-                                                      ),
-                                                      backgroundColor:
-                                                          Colors.red,
-                                                    ),
-                                                  );
-                                                }
+                                                // Appeler la fonction pour mettre à jour le statut
+                                                await _apiService
+                                                    .updateAppointmentStatus(
+                                                      appointment['_id'],
+                                                      "canceled",
+                                                    );
+                                                _showSuccessDialog(
+                                                  'Rendez-vous annulé avec succès',
+                                                );
+                                                // Rafraîchir la liste des rendez-vous
+                                                setState(() {
+                                                  // Cela va déclencher le FutureBuilder pour se rafraîchir
+                                                });
                                               },
                                               child: const Text('Oui'),
                                             ),
@@ -261,7 +300,7 @@ class _ConfirmedScreenState extends State<ConfirmedScreen> {
                                     ),
                                     child: const Center(
                                       child: Text(
-                                        "Cancel",
+                                        "Annuler",
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
@@ -299,12 +338,14 @@ class _ConfirmedScreenState extends State<ConfirmedScreen> {
                                       vertical: 12,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.blueAccent,
+                                      color: Color(
+                                        MyColors.color2,
+                                      ) /*Colors.blueAccent*/,
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: const Center(
                                       child: Text(
-                                        "Reschedule",
+                                        "Reprogrammer",
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,

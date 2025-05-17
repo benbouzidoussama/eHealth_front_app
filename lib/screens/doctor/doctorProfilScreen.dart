@@ -1,5 +1,6 @@
 import 'package:e_health_front/screens/appointment/bookAppointment.dart';
 import 'package:e_health_front/screens/medicalFile/historyAppointmentScreen.dart';
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:flutter/material.dart';
 
 //
@@ -7,6 +8,19 @@ class DoctorProfilScreen extends StatelessWidget {
   final Map<String, dynamic> doctor;
 
   DoctorProfilScreen({super.key, required this.doctor}) {}
+  String _translateDayToFrench(String englishDay) {
+    Map<String, String> dayTranslations = {
+      'Monday': 'Lundi',
+      'Tuesday': 'Mardi',
+      'Wednesday': 'Mercredi',
+      'Thursday': 'Jeudi',
+      'Friday': 'Vendredi',
+      'Saturday': 'Samedi',
+      'Sunday': 'Dimanche',
+    };
+
+    return dayTranslations[englishDay] ?? englishDay;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +33,7 @@ class DoctorProfilScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
         ),
         title: const Text(
-          'Profil du Docteur',
+            'Profil du Médecin',
           style: TextStyle(
             color: Colors.black,
             fontSize: 22,
@@ -39,7 +53,10 @@ class DoctorProfilScreen extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.blueAccent, width: 3),
+                  border: Border.all(
+                    color: Color(MyColors.color2) /*Colors.blueAccent*/,
+                    width: 3,
+                  ),
                 ),
                 child: CircleAvatar(
                   radius: 60,
@@ -62,9 +79,9 @@ class DoctorProfilScreen extends StatelessWidget {
               ),
               Text(
                 doctor['speciality'] ?? 'Spécialité inconnue',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
-                  color: Colors.blueAccent,
+                  color: Color(MyColors.color2) /*Colors.blueAccent*/,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -109,8 +126,8 @@ class DoctorProfilScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(30),
                 child: Container(
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF4880D8), Color(0xFF0056B3)],
+                    gradient: LinearGradient(
+                      colors: [Color(MyColors.color2), Color(MyColors.color1)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -165,7 +182,10 @@ class DoctorProfilScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: Colors.blueAccent, width: 2),
+                    border: Border.all(
+                      color: Color(MyColors.color2) /*Colors.blueAccent*/,
+                      width: 2,
+                    ),
                   ),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 30,
@@ -173,15 +193,18 @@ class DoctorProfilScreen extends StatelessWidget {
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(Icons.history, color: Colors.blueAccent),
+                    children: [
+                      Icon(
+                        Icons.history,
+                        color: Color(MyColors.color2) /*Colors.blueAccent*/,
+                      ),
                       SizedBox(width: 12),
                       Text(
                         'Historique des rendez-vous',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: Colors.blueAccent,
+                          color: Color(MyColors.color2) /*Colors.blueAccent*/,
                         ),
                       ),
                     ],
@@ -215,12 +238,16 @@ class DoctorProfilScreen extends StatelessWidget {
   Widget _buildInfoRow(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon, color: Colors.blueAccent, size: 28),
+        Icon(
+          icon,
+          color: Color(MyColors.color1) /*Colors.blueAccent*/,
+          size: 28,
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(fontSize: 16, color: Colors.black87),
+            style: const TextStyle(fontSize: 15, color: Colors.black87),
           ),
         ),
       ],
@@ -246,9 +273,9 @@ class DoctorProfilScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.access_time,
-                  color: Colors.blueAccent,
+                  color: Color(MyColors.color1) /*Colors.blueAccent*/,
                   size: 22,
                 ),
                 const SizedBox(width: 8),
@@ -263,10 +290,11 @@ class DoctorProfilScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
+
             Column(
               children:
                   schedule.map((daySchedule) {
-                    final day = daySchedule['day'];
+                    final day = _translateDayToFrench(daySchedule['day']);
                     final periods = daySchedule['periods'] as List<dynamic>;
                     final periodsText =
                         periods.isNotEmpty
@@ -290,17 +318,17 @@ class DoctorProfilScreen extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.calendar_today,
-                            color: Colors.blue,
+                            color: /*Colors.blue*/ Color(MyColors.color1),
                             size: 20,
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               day,
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black87,
                               ),
@@ -309,7 +337,7 @@ class DoctorProfilScreen extends StatelessWidget {
                           Text(
                             periodsText,
                             style: const TextStyle(
-                              fontSize: 15,
+                              fontSize: 14,
                               color: Colors.grey,
                             ),
                           ),

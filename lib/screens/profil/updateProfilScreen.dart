@@ -1,3 +1,4 @@
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:e_health_front/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -67,9 +68,7 @@ class _UpdateProfilScreenState extends State<UpdateProfilScreen> {
             context,
             listen: false,
           ).setUser(response['user']);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profil mis à jour avec succès !')),
-          );
+          _showSuccessDialog("Profil mis à jour avec succès !");
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(response['message'] ?? 'Erreur inconnue')),
@@ -103,11 +102,7 @@ class _UpdateProfilScreenState extends State<UpdateProfilScreen> {
           // Rafraîchir l'image
           setState(() {});
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Image de profil mise à jour avec succès !'),
-            ),
-          );
+          _showSuccessDialog("Image de profil mise à jour avec succès !");
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(response['message'] ?? 'Erreur inconnue')),
@@ -164,8 +159,8 @@ class _UpdateProfilScreenState extends State<UpdateProfilScreen> {
                   bottom: 0,
                   right: 0,
                   child: Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.blue,
+                    decoration: BoxDecoration(
+                      color: Color(MyColors.color2) /*Colors.blue*/,
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
@@ -209,7 +204,7 @@ class _UpdateProfilScreenState extends State<UpdateProfilScreen> {
                     child: ElevatedButton(
                       onPressed: _updateProfile,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
+                        backgroundColor: Color(MyColors.color2) /*Colors.blue*/,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -243,7 +238,7 @@ class _UpdateProfilScreenState extends State<UpdateProfilScreen> {
         readOnly: isReadOnly,
         decoration: InputDecoration(
           labelText: label,
-          prefixIcon: Icon(icon, color: Colors.blue),
+          prefixIcon: Icon(icon, color: Color(MyColors.color1) /*Colors.blue*/),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           filled: true,
           fillColor: Colors.white,
@@ -254,6 +249,64 @@ class _UpdateProfilScreenState extends State<UpdateProfilScreen> {
                     ? "Veuillez entrer $label"
                     : null,
       ),
+    );
+  }
+
+  void _showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      barrierDismissible:
+          false, // Empêche de fermer le dialogue en cliquant à l'extérieur
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          backgroundColor: Colors.white,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Icône animée
+              Icon(Icons.check_circle, color: Colors.green, size: 80),
+              const SizedBox(height: 20),
+              // Message de succès
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            Center(
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: Color(MyColors.color1) /*Color(0xFF4880D8)*/,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Fermer le dialogue
+                },
+                child: Text(
+                  "OK",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

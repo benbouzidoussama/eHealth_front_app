@@ -6,8 +6,8 @@ import 'dart:io';
 import 'chat_service.dart'; // Make sure to import the ChatService
 
 class ApiService {
-  //final String baseUrl = "http://10.0.2.2:3000/api";
-  final String baseUrl = "http://localhost:3000/api";
+  final String baseUrl = "http://10.0.2.2:3000/api";
+  //final String baseUrl = "http://localhost:3000/api";
 
   String? token;
   final ChatService _chatService = ChatService(); // Create ChatService instance
@@ -840,6 +840,23 @@ class ApiService {
       return !isExpired;
     } catch (e) {
       return false;
+    }
+  }
+  Future<String> sendMessageChatbot(String message) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/chatbot/chat'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'query': message}),
+      );
+      
+      if (response.statusCode == 200) {
+        return response.body;
+      } else {
+        throw Exception('Erreur ${response.statusCode}: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Échec de connexion au serveur: $e');
     }
   }
 }

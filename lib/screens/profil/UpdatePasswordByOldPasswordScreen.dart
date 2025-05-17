@@ -1,3 +1,4 @@
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:e_health_front/services/api_service.dart';
 import 'package:flutter/material.dart';
 
@@ -229,7 +230,7 @@ class _UpdatePasswordByOldPasswordScreenState
                               }
                             },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 112, 146, 203),
+                      backgroundColor: Color(MyColors.color2),
                       foregroundColor: Colors.white,
                     ),
                     child:

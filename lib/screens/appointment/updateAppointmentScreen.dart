@@ -1,6 +1,7 @@
 // ignore_for_file: curly_braces_in_flow_control_structures
 
 //import 'package:e_health_front/screens/appointment/appointmentScreen.dart';
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:e_health_front/services/api_service.dart';
@@ -71,10 +72,7 @@ class _UpdateAppointmentScreenState extends State<UpdateAppointmentScreen> {
         newDate: formattedDate,
         newTime: hour,
       );
-      await apiService.updateAppointmentStatus(
-        widget.appointmentId,
-        "pending",
-      );
+      await apiService.updateAppointmentStatus(widget.appointmentId, "pending");
 
       // Afficher un message de succès sous forme de showDialog
       _showSuccessDialog();
@@ -119,7 +117,7 @@ class _UpdateAppointmentScreenState extends State<UpdateAppointmentScreen> {
             Center(
               child: TextButton(
                 style: TextButton.styleFrom(
-                  backgroundColor: Color(0xFF4880D8),
+                  backgroundColor: Color(MyColors.color2) /*Color(0xFF4880D8)*/,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -128,7 +126,9 @@ class _UpdateAppointmentScreenState extends State<UpdateAppointmentScreen> {
                 onPressed: () {
                   Navigator.of(context).pop(); // Fermer le dialogue
                   Navigator.of(context).pop(); // Fermer l'écran de réservation
-                  Navigator.of(context).pop('refresh'); // Fermer l'écran de réservation
+                  Navigator.of(
+                    context,
+                  ).pop('refresh'); // Fermer l'écran de réservation
                   // Navigator.push(
                   //   context,
                   //   MaterialPageRoute(
@@ -225,7 +225,11 @@ class _UpdateAppointmentScreenState extends State<UpdateAppointmentScreen> {
               backgroundColor: Colors.white,
               title: Row(
                 children: [
-                  Icon(Icons.check_circle, color: Color(0xFF4880D8), size: 28),
+                  Icon(
+                    Icons.check_circle,
+                    color: Color(MyColors.color2) /*Color(0xFF4880D8)*/,
+                    size: 28,
+                  ),
                   SizedBox(width: 10),
                   Text(
                     "Confirmation",
@@ -267,7 +271,9 @@ class _UpdateAppointmentScreenState extends State<UpdateAppointmentScreen> {
                 Center(
                   child: TextButton(
                     style: TextButton.styleFrom(
-                      backgroundColor: Color(0xFF4880D8),
+                      backgroundColor: Color(
+                        MyColors.color2,
+                      ) /*Color(0xFF4880D8)*/,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -322,7 +328,7 @@ class _UpdateAppointmentScreenState extends State<UpdateAppointmentScreen> {
           shape: BoxShape.circle,
         ),
         selectedDecoration: BoxDecoration(
-          color: Color(0xFF4880D8),
+          color: Color(MyColors.color2) /*Color(0xFF4880D8)*/,
           shape: BoxShape.circle,
         ),
       ),
@@ -355,9 +361,13 @@ class _UpdateAppointmentScreenState extends State<UpdateAppointmentScreen> {
                           onPressed: () => _showConfirmationDialog(hour),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.white,
-                            backgroundColor: const Color(0xFF4880D8),
-                            side: const BorderSide(
-                              color: Color(0xFF4880D8),
+                            backgroundColor: Color(
+                              MyColors.color2,
+                            ) /*const Color(0xFF4880D8)*/,
+                            side: BorderSide(
+                              color: Color(
+                                MyColors.color2,
+                              ) /*Color(0xFF4880D8)*/,
                               width: 2,
                             ),
                             shape: RoundedRectangleBorder(

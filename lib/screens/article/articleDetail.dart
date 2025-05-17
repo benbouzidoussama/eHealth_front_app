@@ -1,5 +1,6 @@
 import 'package:e_health_front/screens/doctor/doctorProfilScreen.dart';
 import 'package:e_health_front/screens/medicalFile/imageViewerScreen.dart';
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:e_health_front/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:e_health_front/providers/article_provider.dart';
@@ -113,13 +114,13 @@ class ArticleDetailScreen extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: theme.primaryColor.withOpacity(0.1),
+                          color: Color(MyColors.color2).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           article['categorie'] ?? 'Santé',
                           style: TextStyle(
-                            color: theme.primaryColor,
+                            color: Color(MyColors.color2),
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
                           ),
@@ -145,14 +146,16 @@ class ArticleDetailScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: theme.primaryColor.withOpacity(0.3),
+                                color: Color(MyColors.color2).withOpacity(0.3),
                                 width: 2,
                               ),
                             ),
                             child: CircleAvatar(
-                              backgroundImage: const AssetImage(
-                                'images/profil.jpeg',
-                              ),
+                              backgroundImage:
+                                  article['idDoctor']['image'] != null
+                                      ? NetworkImage(article['idDoctor']['image'])
+                                      : const AssetImage('images/avatar.jpg')
+                                          as ImageProvider,
                               radius: 24,
                             ),
                           ),

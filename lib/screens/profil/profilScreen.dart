@@ -1,8 +1,10 @@
 import 'package:e_health_front/providers/article_provider.dart';
 import 'package:e_health_front/screens/auth/loginScreen.dart';
+import 'package:e_health_front/screens/chat/chatbotScreen.dart';
 import 'package:e_health_front/screens/notification/notifications_screen.dart';
 import 'package:e_health_front/screens/profil/UpdatePasswordByOldPasswordScreen.dart';
 import 'package:e_health_front/screens/profil/updateProfilScreen.dart';
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:e_health_front/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:e_health_front/providers/user_provider.dart';
@@ -43,7 +45,7 @@ class ProfilScreen extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 55,
-                  backgroundColor: Colors.blueAccent,
+                  backgroundColor: Color(MyColors.color1) /*Colors.blueAccent*/,
                   child: CircleAvatar(
                     radius: 50,
 
@@ -115,6 +117,20 @@ class ProfilScreen extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => NotificationsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  // Nouvel élément pour le chatbot
+                  _buildSettingsItem(
+                    Icons.chat_bubble_outline,
+                    'Assistant Santé',
+                    context,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatbotScreen(),
                         ),
                       );
                     },
@@ -210,7 +226,14 @@ class ProfilScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           child: Row(
             children: [
-              Icon(icon, color: isLogout ? Colors.red : Colors.blue, size: 26),
+              Icon(
+                icon,
+                color:
+                    isLogout
+                        ? Colors.red
+                        : Color(MyColors.color1) /*Colors.blue*/,
+                size: 26,
+              ),
               const SizedBox(width: 15),
               Expanded(
                 child: Text(

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:e_health_front/widgets/ClipPainter.dart';
 import 'package:flutter/material.dart';
 
@@ -22,10 +23,7 @@ class BezierContainer extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Colors.blue,
-                  Colors.lightBlue,
-                ],
+                colors: [Color(MyColors.color2), Color(MyColors.color2)],
               ),
             ),
           ),

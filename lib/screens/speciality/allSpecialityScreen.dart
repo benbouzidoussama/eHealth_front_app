@@ -84,7 +84,7 @@ class SpecialityCard extends StatelessWidget {
         width: 110,
         margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
         decoration: BoxDecoration(
-          color: Color(MyColors.bleuPrincipal),
+          color: Color(MyColors.color2),
           borderRadius: BorderRadius.circular(10),
           boxShadow: const [
             BoxShadow(blurRadius: 4, spreadRadius: 2, color: Colors.black12),

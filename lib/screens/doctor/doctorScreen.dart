@@ -1,3 +1,4 @@
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:e_health_front/screens/appointment/bookAppointment.dart';
 import 'package:e_health_front/screens/doctor/doctorProfilScreen.dart';
@@ -49,7 +50,7 @@ class _DoctorScreenState extends State<DoctorScreen> {
         allDoctors = doctors;
         filterDoctors(_searchController.text);
       });
-      
+
       return doctors;
     } catch (e) {
       // Propager l'erreur pour que FutureBuilder puisse la gérer
@@ -63,18 +64,22 @@ class _DoctorScreenState extends State<DoctorScreen> {
       if (searchText.isEmpty) {
         filteredDoctors = List.from(allDoctors);
       } else {
-        filteredDoctors = allDoctors.where((doctor) {
-          final firstName = doctor['firstName']?.toString().toLowerCase() ?? '';
-          final lastName = doctor['lastName']?.toString().toLowerCase() ?? '';
-          final speciality = doctor['speciality']?.toString().toLowerCase() ?? '';
-          final fullName = '$firstName $lastName'.toLowerCase();
-          final query = searchText.toLowerCase();
+        filteredDoctors =
+            allDoctors.where((doctor) {
+              final firstName =
+                  doctor['firstName']?.toString().toLowerCase() ?? '';
+              final lastName =
+                  doctor['lastName']?.toString().toLowerCase() ?? '';
+              final speciality =
+                  doctor['speciality']?.toString().toLowerCase() ?? '';
+              final fullName = '$firstName $lastName'.toLowerCase();
+              final query = searchText.toLowerCase();
 
-          return firstName.contains(query) ||
-              lastName.contains(query) ||
-              fullName.contains(query) ||
-              speciality.contains(query);
-        }).toList();
+              return firstName.contains(query) ||
+                  lastName.contains(query) ||
+                  fullName.contains(query) ||
+                  speciality.contains(query);
+            }).toList();
       }
     });
   }
@@ -213,7 +218,8 @@ class DoctorGrid extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => DoctorProfilScreen(doctor: doctors[index]),
+                builder:
+                    (context) => DoctorProfilScreen(doctor: doctors[index]),
               ),
             );
           },
@@ -251,9 +257,10 @@ class DoctorCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircleAvatar(
-              backgroundImage: doctor['image'] != null
-                  ? NetworkImage(doctor['image'])
-                  : const AssetImage('images/avatar.jpg') as ImageProvider,
+              backgroundImage:
+                  doctor['image'] != null
+                      ? NetworkImage(doctor['image'])
+                      : const AssetImage('images/avatar.jpg') as ImageProvider,
               radius: 35,
             ),
             const SizedBox(height: 10),
@@ -280,7 +287,7 @@ class DoctorCard extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
+                backgroundColor: Color(MyColors.color2) /*Colors.blueAccent*/,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),

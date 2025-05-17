@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api, use_super_parameters, sized_box_for_whitespace
 
 import 'package:e_health_front/screens/auth/loginScreen.dart';
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:e_health_front/widgets/bezierContainer.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -23,7 +24,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _obscureConfirmPassword = true;
   DateTime? _selectedDate;
 
-  // Controllers for text fields
+  // Contrôleurs pour les champs de texte
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -71,38 +72,60 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        SizedBox(height: height * .2),
-                        Text(
-                          'E-Health',
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.lightBlue,
-                          ),
+                        SizedBox(height: height * .15),
+                        Image.asset(
+                          'images/logo7.png',
+                          width: 150,
+                          height: 150,
                         ),
-                        SizedBox(height: 50),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Heal',
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.w800,
+                                color: Color(MyColors.color2),
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                            Text(
+                              'ora',
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.w600,
+                                color: Color(MyColors.color2),
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                            SizedBox(width: 5),
+                          ],
+                        ),
+                        SizedBox(height: 20),
                         _buildTextField(
-                          "First Name",
-                          "first name",
+                          "Prénom",
+                          "prénom",
                           Icons.person,
                           _firstNameController,
                           (value) {
                             if (value!.isEmpty ||
                                 !RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
-                              return 'Please enter a valid first name';
+                              return 'Veuillez entrer un prénom valide';
                             }
                             return null;
                           },
                         ),
                         _buildTextField(
-                          "Last Name",
-                          "last name",
+                          "Nom",
+                          "nom",
                           Icons.person,
                           _lastNameController,
                           (value) {
                             if (value!.isEmpty ||
                                 !RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
-                              return 'Please enter a valid last name';
+                              return 'Veuillez entrer un nom valide';
                             }
                             return null;
                           },
@@ -117,7 +140,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 !RegExp(
                                   r'^[^@]+@[^@]+\.[^@]+',
                                 ).hasMatch(value)) {
-                              return 'Please enter a valid email';
+                              return 'Veuillez entrer un email valide';
                             }
                             return null;
                           },
@@ -130,39 +153,39 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           (value) {
                             if (value!.isEmpty ||
                                 !RegExp(r'^\d{8}$').hasMatch(value)) {
-                              return 'CIN must be 8 digits';
+                              return 'Le CIN doit comporter 8 chiffres';
                             }
                             return null;
                           },
                         ),
                         _buildTextField(
-                          "Phone",
-                          "phone",
+                          "Téléphone",
+                          "téléphone",
                           Icons.phone,
                           _phoneController,
                           (value) {
                             if (value!.isEmpty ||
                                 !RegExp(r'^\d{8}$').hasMatch(value)) {
-                              return 'Phone number must be 8 digits';
+                              return 'Le numéro de téléphone doit comporter 8 chiffres';
                             }
                             return null;
                           },
                         ),
                         _buildTextField(
-                          "Address",
-                          "address",
+                          "Adresse",
+                          "adresse",
                           Icons.home,
                           _addressController,
                           (value) {
                             if (value!.isEmpty) {
-                              return 'Please enter your address';
+                              return 'Veuillez entrer votre adresse';
                             }
                             return null;
                           },
                         ),
                         _buildDatePickerField(),
                         _buildPasswordField(
-                          "Password",
+                          "Mot de passe",
                           _obscurePassword,
                           (val) {
                             setState(
@@ -172,13 +195,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           _passwordController,
                           (value) {
                             if (value!.isEmpty || value.length < 8) {
-                              return 'Password must be at least 8 characters';
+                              return 'Le mot de passe doit comporter au moins 8 caractères';
                             }
                             return null;
                           },
                         ),
                         _buildPasswordField(
-                          "Confirm Password",
+                          "Confirmer le mot de passe",
                           _obscureConfirmPassword,
                           (val) {
                             setState(
@@ -191,7 +214,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           (value) {
                             if (value!.isEmpty ||
                                 value != _passwordController.text) {
-                              return 'Passwords do not match';
+                              return 'Les mots de passe ne correspondent pas';
                             }
                             return null;
                           },
@@ -255,7 +278,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            "Date of Birth",
+            "Date de naissance",
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
           ),
           SizedBox(height: 10),
@@ -265,8 +288,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             decoration: InputDecoration(
               hintText:
                   _selectedDate == null
-                      ? "date of birth"
-                      : "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}",
+                      ? "date de naissance"
+                      : "${_selectedDate!.day.toString().padLeft(2, '0')}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.year}",
               suffixIcon: IconButton(
                 icon: Icon(Icons.calendar_today, color: Colors.black54),
                 onPressed: () => _selectDate(context),
@@ -305,7 +328,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             style: TextStyle(fontSize: 20),
             obscureText: obscureText,
             decoration: InputDecoration(
-              hintText: "password",
+              hintText: "mot de passe",
               suffixIcon: IconButton(
                 icon: Icon(
                   obscureText ? Icons.visibility_off : Icons.visibility,
@@ -335,10 +358,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(15)),
-          gradient: LinearGradient(colors: [Colors.blue, Colors.lightBlue]),
+          gradient: LinearGradient(
+            colors: [Color(MyColors.color2), Color(MyColors.color2)],
+          ),
         ),
         child: Text(
-          'Register',
+          'S\'inscrire',
           style: TextStyle(fontSize: 20, color: Colors.white),
         ),
       ),
@@ -361,14 +386,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'Already have an account ?',
+              'Vous avez déjà un compte ?',
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
             ),
             SizedBox(width: 10),
             Text(
-              'Login',
+              'Connexion',
               style: TextStyle(
-                color: Color(0xFF0389F6),
+                color: Color(MyColors.color2) /*Color(0xFF0389F6)*/,
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
               ),
@@ -391,11 +416,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           padding: EdgeInsets.symmetric(horizontal: 10),
           child: Row(
             children: <Widget>[
-              Icon(Icons.arrow_back, color: Colors.black, size: 30),
-              Text(
-                'Back',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-              ),
+              Icon(Icons.keyboard_arrow_left, color: Colors.black, size: 30),
             ],
           ),
         ),
@@ -417,15 +438,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
       "role": "patient",
     };
 
-
     final response = await _apiService.registerUser(userData);
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200 ||
+        data['message'] == "refreshToken is not defined") {
       print("Inscription réussie: ${data['message']}");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Inscription réussie")));
+      _showSuccessDialog("Inscription réussie");
     } else {
       final errorData = jsonDecode(response.body);
       String errorMessage = errorData['message'] ?? 'Erreur inconnue';
@@ -441,5 +459,63 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (_formKey.currentState!.validate()) {
       _registerUser(); // Envoi des données au backend
     }
+  }
+
+  void _showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      barrierDismissible:
+          false, // Empêche de fermer le dialogue en cliquant à l'extérieur
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          backgroundColor: Colors.white,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Icône animée
+              Icon(Icons.check_circle, color: Colors.green, size: 80),
+              const SizedBox(height: 20),
+              // Message de succès
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            Center(
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: Color(MyColors.color1) /*Color(0xFF4880D8)*/,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Fermer le dialogue
+                },
+                child: Text(
+                  "OK",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:e_health_front/screens/medicalFile/imageViewerScreen.dart';
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/chat_service.dart';
@@ -263,9 +264,10 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         title: Row(
           children: [
             CircleAvatar(
-              backgroundImage: NetworkImage(
-                widget.doctor['image'] ?? 'https://via.placeholder.com/50',
-              ),
+              backgroundImage:
+                  widget.doctor['image'] != null
+                      ? NetworkImage(widget.doctor['image'])
+                      : const AssetImage('images/avatar.jpg') as ImageProvider,
               radius: 20,
             ),
             const SizedBox(width: 10),
@@ -307,7 +309,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                             ),
                             SizedBox(height: 10),
                             Text(
-                              'No messages yet',
+                              'Aucun message pour le moment',
                               style: TextStyle(
                                 color: Colors.grey,
                                 fontSize: 16,
@@ -315,7 +317,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                             ),
                             SizedBox(height: 5),
                             Text(
-                              'Send a message to start the conversation',
+                              'Envoyez un message pour démarrer la conversation',
                               style: TextStyle(
                                 color: Colors.grey,
                                 fontSize: 14,
@@ -388,7 +390,9 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                                 decoration: BoxDecoration(
                                   color:
                                       isCurrentUser
-                                          ? Colors.blue[500]
+                                          ? Color(
+                                            MyColors.color2,
+                                          ) /*Colors.blue[500]*/
                                           : Colors.white,
                                   borderRadius: BorderRadius.circular(15),
                                   boxShadow: [
@@ -601,8 +605,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.add_circle_outline),
-                  color: Colors.blue[700],
+                  icon: Icon(Icons.add_circle_outline),
+                  color: Color(MyColors.color2) /*Colors.blue[700]*/,
                   onPressed: () {
                     // Show attachment options
                     showModalBottomSheet(
@@ -627,7 +631,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                                   children: [
                                     _buildAttachmentOption(
                                       icon: Icons.photo,
-                                      label: "Gallery",
+                                      label: "Galerie",
                                       color: Colors.purple,
                                       onTap: () {
                                         Navigator.pop(context);
@@ -636,29 +640,11 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                                     ),
                                     _buildAttachmentOption(
                                       icon: Icons.camera_alt,
-                                      label: "Camera",
+                                      label: "Appareil photo",
                                       color: Colors.red,
                                       onTap: () {
                                         Navigator.pop(context);
                                         _pickImageFromCamera();
-                                      },
-                                    ),
-                                    _buildAttachmentOption(
-                                      icon: Icons.description,
-                                      label: "Document",
-                                      color: Colors.blue,
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                        // Implement document picker
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'Document sharing coming soon',
-                                            ),
-                                          ),
-                                        );
                                       },
                                     ),
                                   ],
@@ -682,7 +668,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                           child: TextField(
                             controller: _messageController,
                             decoration: const InputDecoration(
-                              hintText: 'Type a message...',
+                              hintText: 'Écrivez un message...',
                               border: InputBorder.none,
                               contentPadding: EdgeInsets.symmetric(
                                 vertical: 10,
@@ -703,7 +689,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.blue[700],
+                      color: Color(MyColors.color2) /*Colors.blue[700]*/,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(

@@ -1,3 +1,4 @@
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:e_health_front/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:e_health_front/screens/chat/chatDetailScreen.dart';
@@ -49,7 +50,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   controller: _searchController,
                   autofocus: true,
                   decoration: InputDecoration(
-                    hintText: "Search conversations...",
+                    hintText: "Rechercher des conversations...",
                     border: InputBorder.none,
                     hintStyle: TextStyle(color: Colors.grey[400]),
                   ),
@@ -92,17 +93,17 @@ class _ChatListScreenState extends State<ChatListScreen> {
           // Show bottom sheet with doctors that don't have a chat
           _showDoctorsWithoutChat();
         },
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Color(MyColors.color2),
         elevation: 4,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.0),
         ),
         icon: const Icon(Icons.chat, color: Colors.white),
         label: const Text(
-          'New conversation',
+          'Nouvelle conversation',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        tooltip: 'New conversation',
+        tooltip: 'Nouvelle conversation',
       ),
       floatingActionButtonLocation: CustomFloatingActionButtonLocation(),
     );
@@ -160,7 +161,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Select a doctor',
+                        'Sélectionner un médecin',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -179,7 +180,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                       doctorsWithoutChat.isEmpty
                           ? const Center(
                             child: Text(
-                              'No doctors available for new conversations',
+                                'Aucun médecin disponible pour une nouvelle conversation',
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey,
@@ -313,16 +314,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     ChatDetailScreen(chatId: newChat['_id'], doctor: doctor),
           ),
         ).then((_) => _refreshChats());
-
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Started conversation with Dr. ${doctor['firstName']} ${doctor['lastName']}',
-            ),
-            backgroundColor: Colors.green,
-          ),
-        );
       } else {
         // Show error if request failed
         ScaffoldMessenger.of(context).showSnackBar(
@@ -438,7 +429,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                       backgroundImage:
                           doctor['image'] != null
                               ? NetworkImage(doctor['image'])
-                              : const AssetImage('images/profil.jpeg')
+                              : const AssetImage('images/avatar.jpg')
                                   as ImageProvider,
                     ),
                   ),
@@ -497,10 +488,12 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                           margin: const EdgeInsets.only(
                                             right: 4,
                                           ),
-                                          child: const Icon(
+                                          child: Icon(
                                             Icons.photo,
                                             size: 16,
-                                            color: Colors.blue,
+                                            color: Color(
+                                              MyColors.color1,
+                                            ) /*Colors.blue*/,
                                           ),
                                         )
                                       else if (lastMessage['type'] != 'text')
@@ -557,7 +550,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                     ],
                                   )
                                   : Text(
-                                    'Start a conversation',
+                                    'Commencez la conversation',
                                     style: TextStyle(
                                       color: Colors.grey[500],
                                       fontStyle: FontStyle.italic,
@@ -633,7 +626,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ),
           const SizedBox(height: 24),
           Text(
-            'No conversations yet',
+            'Aucune conversation pour le moment',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w500,
@@ -644,7 +637,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32),
             child: Text(
-              'Connect with healthcare professionals through secure messaging',
+                'Discutez en toute sécurité avec des professionnels de santé',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey[600], fontSize: 16),
             ),

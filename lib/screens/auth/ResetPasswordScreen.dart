@@ -1,4 +1,5 @@
 import 'package:e_health_front/screens/auth/loginScreen.dart';
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:e_health_front/widgets/bezierContainer.dart';
 import '../../services/api_service.dart';
@@ -157,7 +158,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                   Radius.circular(15),
                                 ),
                                 gradient: LinearGradient(
-                                  colors: [Colors.blue, Colors.lightBlue],
+                                  colors: [
+                                    Color(MyColors.color2),
+                                    Color(MyColors.color2),
+                                  ],
                                 ),
                               ),
                               child: Text(
@@ -181,19 +185,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                     : Colors.red,
                           ),
                         ),
-                      SizedBox(height: 20),
-
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Text(
-                          'Retour',
-                          style: TextStyle(
-                            color: Color(0xFF0389F6),
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -206,7 +197,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         child: Text(
                           'Retour à la connexion',
                           style: TextStyle(
-                            color: Color(0xFF0389F6),
+                            color: Color(MyColors.color2) /*Color(0xFF0389F6)*/,
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                           ),

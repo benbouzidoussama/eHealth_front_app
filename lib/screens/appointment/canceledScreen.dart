@@ -28,12 +28,7 @@ class _CanceledScreenState extends State<CanceledScreen> {
         future: _fetchCanceledAppointments(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: Color.fromARGB(255, 0, 128, 255),
-                strokeWidth: 2,
-              ),
-            );
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(
               child: Text(
@@ -75,7 +70,7 @@ class _CanceledScreenState extends State<CanceledScreen> {
                               title: Text(
                                 doctor != null
                                     ? 'Dr. ${doctor['doctorName']}'
-                                    : 'Docteur inconnu',
+                                    : 'Médecin inconnu',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -106,7 +101,7 @@ class _CanceledScreenState extends State<CanceledScreen> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                        'Erreur : Impossible de charger les données du docteur',
+                                        'Erreur : Impossible de charger les données du médecin',
                                       ),
                                     ),
                                   );
@@ -169,7 +164,11 @@ class _CanceledScreenState extends State<CanceledScreen> {
                                     ),
                                     const SizedBox(width: 5),
                                     Text(
-                                      appointment['status'],
+                                      appointment['status'] == 'confirmed'
+                                          ? 'confirmé'
+                                          : appointment['status'] == 'pending'
+                                          ? 'en attente'
+                                          : 'annulé',
                                       style: const TextStyle(
                                         color: Colors.black54,
                                       ),

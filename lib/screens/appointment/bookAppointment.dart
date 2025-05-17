@@ -1,5 +1,6 @@
 // ignore_for_file: curly_braces_in_flow_control_structures
 
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:e_health_front/services/api_service.dart';
@@ -113,7 +114,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
             Center(
               child: TextButton(
                 style: TextButton.styleFrom(
-                  backgroundColor: Color(0xFF4880D8),
+                  backgroundColor: Color(MyColors.color2), //Color(0xFF4880D8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -213,7 +214,11 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               backgroundColor: Colors.white,
               title: Row(
                 children: [
-                  Icon(Icons.check_circle, color: Color(0xFF4880D8), size: 28),
+                  Icon(
+                    Icons.check_circle,
+                    color: Color(MyColors.color2) /*Color(0xFF4880D8)*/,
+                    size: 28,
+                  ),
                   SizedBox(width: 10),
                   Text(
                     "Confirmation",
@@ -255,7 +260,9 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                 Center(
                   child: TextButton(
                     style: TextButton.styleFrom(
-                      backgroundColor: Color(0xFF4880D8),
+                      backgroundColor: Color(
+                        MyColors.color2,
+                      ), //Color(0xFF4880D8),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -310,7 +317,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           shape: BoxShape.circle,
         ),
         selectedDecoration: BoxDecoration(
-          color: Color(0xFF4880D8),
+          color: Color(MyColors.color2), //Color(0xFF4880D8),
           shape: BoxShape.circle,
         ),
       ),
@@ -389,9 +396,13 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                           onPressed: () => _showConfirmationDialog(hour),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.white,
-                            backgroundColor: const Color(0xFF4880D8),
-                            side: const BorderSide(
-                              color: Color(0xFF4880D8),
+                            backgroundColor: Color(
+                              MyColors.color2,
+                            ) /*const Color(0xFF4880D8)*/,
+                            side: BorderSide(
+                              color: Color(
+                                MyColors.color2,
+                              ) /* Color(0xFF4880D8)*/,
                               width: 2,
                             ),
                             shape: RoundedRectangleBorder(
@@ -428,7 +439,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           child: const Icon(Icons.keyboard_arrow_left, color: Colors.black),
         ),
         title: const Text(
-          'Book Appointment',
+          'Réserver un rendez-vous',
           style: TextStyle(
             color: Colors.black,
             fontSize: 20,

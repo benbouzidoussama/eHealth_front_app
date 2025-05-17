@@ -34,7 +34,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 224, 221, 221),
       appBar: AppBar(
-        //automaticallyImplyLeading: false, // Supprime l'icône de retour
+        automaticallyImplyLeading: false, // Supprime l'icône de retour
         backgroundColor: const Color.fromARGB(255, 224, 221, 221),
         title: Row(
           children: [
@@ -164,7 +164,7 @@ class HomeScreen extends StatelessWidget {
                     child: Text(
                       'Voir Tout',
                       style: TextStyle(
-                        color: Color(0xff575de3),
+                        color: Color(MyColors.color2),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -203,7 +203,7 @@ class HomeScreen extends StatelessWidget {
                     child: Text(
                       'Voir Tout',
                       style: TextStyle(
-                        color: Color(0xff575de3),
+                        color: Color(MyColors.color2),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -254,7 +254,7 @@ class AppointmentCard extends StatelessWidget {
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Color(MyColors.bleuPrincipal),
+            color: Color(MyColors.color2),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Material(
@@ -349,7 +349,7 @@ class ScheduleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Color(0xFF9BB4DC),
+        color: Color(0xFF0098e9),
         borderRadius: BorderRadius.circular(10),
       ),
       width: double.infinity,

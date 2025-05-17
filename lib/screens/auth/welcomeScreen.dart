@@ -70,32 +70,32 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             child: Column(
               children: [
                 // Custom AppBar
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 20.0,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Text(
-                          "E-Health",
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(
+                //     horizontal: 16.0,
+                //     vertical: 20.0,
+                //   ),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.center,
+                //     children: [
+                //       Container(
+                //         padding: const EdgeInsets.all(10),
+                //         decoration: BoxDecoration(
+                //           color: Colors.white.withOpacity(0.2),
+                //           borderRadius: BorderRadius.circular(15),
+                //         ),
+                //         child: Text(
+                //           "Healora",
+                //           style: TextStyle(
+                //             fontSize: 30,
+                //             fontWeight: FontWeight.bold,
+                //             color: Colors.white,
+                //           ),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
 
                 // Main content
                 Expanded(
@@ -105,28 +105,56 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         // App icon or illustration
-                        FadeTransition(
-                          opacity: _animation,
-                          child: Container(
-                            width: 150,
-                            height: 150,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 15,
-                                  spreadRadius: 5,
-                                ),
-                              ],
-                            ),
-                            child: Icon(
-                              Icons.favorite,
-                              size: 80,
-                              color: Colors.redAccent,
-                            ),
-                          ),
+                        // FadeTransition(
+                        //   opacity: _animation,
+                        //   child: Container(
+                        //     width: 150,
+                        //     height: 150,
+                        //     decoration: BoxDecoration(
+                        //       color: Colors.white,
+                        //       shape: BoxShape.circle,
+                        //       boxShadow: [
+                        //         BoxShadow(
+                        //           color: Colors.black12,
+                        //           blurRadius: 15,
+                        //           spreadRadius: 5,
+                        //         ),
+                        //       ],
+                        //     ),
+                        //     child: Image.asset(
+                        //       'assets/images/logo.jpeg',
+                        //       fit: BoxFit.cover,
+                        //     ),
+                        //   ),
+                        // ),
+                        // Or use a network image
+                        // Container(
+                        //   width: 150,
+                        //   height: 150,
+                        //   // decoration: BoxDecoration(
+                        //   //   color: Colors.transparent,
+                        //   //   shape: BoxShape.circle,
+                        //   // ),
+                        //   child: ClipOval(
+                        //     child: Image.asset(
+                        //       'images/logo5.png',
+                        //       //fit: BoxFit.cover,
+                        //     ),
+                        //   ),
+                        // ),
+                        // ClipOval(
+                        //   child: Padding(
+                        //     padding: const EdgeInsets.all(15),
+                        //     child: Image.asset(
+                        //       'images/logo5.png',
+                        //       fit: BoxFit.cover,
+                        //     ),
+                        //   ),
+                        // ),
+                        Image.asset(
+                          'images/logo5.png',
+                          width: 150,
+                          height: 150,
                         ),
                         const SizedBox(height: 40),
 

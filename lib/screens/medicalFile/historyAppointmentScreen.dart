@@ -3,6 +3,7 @@ import 'package:e_health_front/screens/medicalFile/noteScreen.dart';
 import 'package:e_health_front/screens/medicalFile/ordonnanceScreen.dart';
 import 'package:e_health_front/screens/medicalFile/regimeScreen.dart';
 import 'package:e_health_front/screens/medicalFile/pdfViewerScreen.dart'; // Ensure this import is correct and the file exists
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:e_health_front/services/api_service.dart';
 
@@ -417,11 +418,8 @@ class _HistoryAppointmentScreenState extends State<HistoryAppointmentScreen> {
   void _openDocument(BuildContext context, Map<String, dynamic> doc) {
     // Vérifier que doc['file'] existe et n'est pas vide
     if (doc['file'] == null || doc['file'].toString().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Lien vers le fichier manquant ou invalide'),
-          backgroundColor: Colors.red,
-        ),
+      _showSuccessDialog(
+        'Erreur : Lien vers le fichier manquant ou invalide',
       );
       return;
     }
@@ -628,4 +626,64 @@ class _HistoryAppointmentScreenState extends State<HistoryAppointmentScreen> {
       ),
     );
   }
+  void _showSuccessDialog(String message) {
+      showDialog(
+        context: context,
+        barrierDismissible:
+            false, // Empêche de fermer le dialogue en cliquant à l'extérieur
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            backgroundColor: Colors.white,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Icône animée
+                Icon(Icons.check_circle, color: Colors.green, size: 80),
+                const SizedBox(height: 20),
+                // Message de succès
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              Center(
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor:Color(
+                        MyColors.color1,
+                      ) /*Color(0xFF4880D8)*/,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Fermer le dialogue
+                  },
+                  child: Text(
+                    "OK",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
 }

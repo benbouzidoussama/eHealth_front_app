@@ -3,6 +3,7 @@
 import 'package:e_health_front/screens/auth/forgotPasswordScreen.dart';
 import 'package:e_health_front/screens/auth/signupScreen.dart';
 import 'package:e_health_front/screens/bottom_nav/navigation.dart';
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:e_health_front/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:e_health_front/widgets/bezierContainer.dart';
@@ -23,9 +24,15 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   final ApiService _apiService = ApiService();
+  String? _errorMessage; // New variable to store error message
 
   // Fonction pour gérer la connexion
   Future<void> _loginUser() async {
+    // Reset error message at the start of login attempt
+    setState(() {
+      _errorMessage = null;
+    });
+
     print("clique sue se connecter");
     final loginData = {
       "email": _emailController.text,
@@ -38,12 +45,10 @@ class _LoginScreenState extends State<LoginScreen> {
     final userData = responseData["userData"];
 
     // Après la connexion réussie dans la méthode _loginUser()
-    if (loginResponse != null && loginResponse["accessToken"] != null) {
+    if (loginResponse != null &&
+        loginResponse["accessToken"] != null &&
+        loginResponse["role"] == "patient") {
       print("Connexion réussie : ${loginResponse['accessToken']}");
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Connexion réussie")));
 
       // Stocker les informations de l'utilisateur
       Provider.of<UserProvider>(context, listen: false).setUser(userData);
@@ -61,6 +66,11 @@ class _LoginScreenState extends State<LoginScreen> {
         context,
         MaterialPageRoute(builder: (_) => Navigation()),
       );
+    } else {
+      // Gérer les erreurs de connexion
+      setState(() {
+        _errorMessage = "email ou mot de passe incorrect";
+      });
     }
   }
 
@@ -86,49 +96,47 @@ class _LoginScreenState extends State<LoginScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      SizedBox(height: height * .2),
-                      RichText(
-                        textAlign: TextAlign.center,
-                        text: const TextSpan(
-                          text: 'E',
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.lightBlue,
+                      SizedBox(height: height * .15),
+                      Image.asset('images/logo7.png', width: 150, height: 150),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Heal',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w800,
+                              color: Color(MyColors.color2),
+                              letterSpacing: 1.2,
+                            ),
                           ),
-                          children: [
-                            TextSpan(
-                              text: '-H',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 30,
-                              ),
+                          Text(
+                            'ora',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w600,
+                              color: Color(MyColors.color2),
+                              letterSpacing: 0.8,
                             ),
-                            TextSpan(
-                              text: 'e',
-                              style: TextStyle(
-                                color: Colors.blue,
-                                fontSize: 30,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'alt',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 30,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'h',
-                              style: TextStyle(
-                                color: Colors.lightBlue,
-                                fontSize: 30,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                          SizedBox(width: 5),
+                        ],
                       ),
-                      SizedBox(height: 50),
+                      SizedBox(height: 20),
+                      // Display error message if exists
+                      if (_errorMessage != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: Text(
+                            _errorMessage!,
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
                       TextField(
                         controller: _emailController,
                         style: TextStyle(fontSize: 20),
@@ -201,7 +209,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed:
                               _loginUser, // Appeler la logique de connexion
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
+                            backgroundColor: Color(
+                              MyColors.color2,
+                            ) /*Colors.blue*/,
                             padding: EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -239,7 +249,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Text(
                                   'S\'inscrire',
                                   style: TextStyle(
-                                    color: Color(0xFF0389F6),
+                                    color: Color(
+                                      MyColors.color2,
+                                    ) /*Color(0xFF0389F6)*/,
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -269,13 +281,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 10),
                     child: Row(
                       children: <Widget>[
-                        Icon(Icons.keyboard_arrow_left, color: Colors.black),
-                        Text(
-                          'Retour',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        Icon(
+                          Icons.keyboard_arrow_left,
+                          color: Colors.black,
+                          size: 30,
                         ),
                       ],
                     ),

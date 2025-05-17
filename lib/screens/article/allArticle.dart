@@ -1,6 +1,7 @@
 import 'package:e_health_front/providers/article_provider.dart';
 import 'package:e_health_front/screens/article/articleDetail.dart';
 import 'package:e_health_front/screens/doctor/doctorProfilScreen.dart';
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:e_health_front/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -48,14 +49,14 @@ class _AllArticleScreenState extends State<AllArticleScreen> {
     final int totalPages = (filteredArticles.length / _articlesPerPage).ceil();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FB),
+      backgroundColor: const Color.fromARGB(255, 224, 221, 221),
       appBar: AppBar(
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Colors.grey, Colors.white],
+              colors: [Color(MyColors.color2), Color(MyColors.color2)],
             ),
           ),
         ),
@@ -256,7 +257,7 @@ class _AllArticleScreenState extends State<AllArticleScreen> {
         icon: Icon(
           icon,
           size: 20,
-          color: onPressed != null ? Color(0xff575de3) : Colors.grey,
+          color: onPressed != null ? Color(MyColors.color2) : Colors.grey,
         ),
         onPressed: onPressed,
       ),
@@ -276,7 +277,7 @@ class _AllArticleScreenState extends State<AllArticleScreen> {
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: isCurrentPage ? Color(0xff575de3) : Colors.white,
+          color: isCurrentPage ? Color(MyColors.color2) : Colors.white,
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
@@ -347,7 +348,7 @@ class ArticleCard extends StatelessWidget {
                           height:
                               180, // Augmentation de la hauteur pour mieux voir l'image
                           width: double.infinity,
-                          color: Color(0xff575de3).withOpacity(0.1),
+                          color: Color(MyColors.color2).withOpacity(0.1),
                           child: Image(
                             image: NetworkImage(article['image']),
                             fit:
@@ -374,7 +375,10 @@ class ArticleCard extends StatelessWidget {
 
               // Contenu de l'article
               Padding(
-                padding: EdgeInsets.symmetric(vertical: screenWidth * 0.03),
+                padding: EdgeInsets.symmetric(
+                  vertical: screenWidth * 0.03,
+                  horizontal: screenWidth * 0.03,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -394,7 +398,7 @@ class ArticleCard extends StatelessWidget {
                             vertical: 5,
                           ),
                           decoration: BoxDecoration(
-                            color: Color(0xff575de3).withOpacity(0.6),
+                            color: Color(MyColors.color2).withOpacity(0.6),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
@@ -458,10 +462,10 @@ class ArticleCard extends StatelessWidget {
                               const SizedBox(width: 8),
                               Text(
                                 article['doctorName'],
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 14,
-                                  color: Color(0xff575de3),
+                                  color: Color(MyColors.color2),
                                 ),
                               ),
                             ],

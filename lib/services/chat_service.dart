@@ -12,10 +12,10 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class ChatService {
-  final String baseUrl = "http://localhost:3000/api";
-  final String socketUrl = "http://localhost:3000";
-  //final String baseUrl = "http://10.0.2.2:3000/api";
-  //final String socketUrl = "http://10.0.2.2:3000";
+  //final String baseUrl = "http://localhost:3000/api";
+  //final String socketUrl = "http://localhost:3000";
+  final String baseUrl = "http://10.0.2.2:3000/api";
+  final String socketUrl = "http://10.0.2.2:3000";
 
   IO.Socket? socket;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =

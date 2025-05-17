@@ -1,3 +1,4 @@
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:e_health_front/widgets/bezierContainer.dart';
 import 'package:e_health_front/screens/auth/ResetPasswordScreen.dart';
@@ -110,7 +111,10 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                               gradient: LinearGradient(
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
-                                colors: [Colors.blue, Colors.lightBlue],
+                                colors: [
+                                  Color(MyColors.color2),
+                                  Color(MyColors.color2),
+                                ],
                               ),
                             ),
                             child: InkWell(
@@ -143,7 +147,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                         child: Text(
                           'Retour',
                           style: TextStyle(
-                            color: Color(0xFF0389F6),
+                            color: Color(MyColors.color2) /*Color(0xFF0389F6)*/,
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                           ),

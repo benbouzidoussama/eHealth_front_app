@@ -1,6 +1,7 @@
 import 'package:e_health_front/screens/appointment/canceledScreen.dart';
 import 'package:e_health_front/screens/appointment/upcomingScreen.dart';
 import 'package:e_health_front/screens/appointment/confirmedScreen.dart';
+import 'package:e_health_front/screens/styles/colors.dart';
 
 import 'package:flutter/material.dart';
 
@@ -14,11 +15,11 @@ class AppointmentScreen extends StatefulWidget {
 
 class _AppointmentScreenState extends State<AppointmentScreen> {
   int _buttonIndex = 0;
-  final List<String> _tabs = ["Upcoming", "Confirmed", "Canceled"];
+  final List<String> _tabs = ["En Attentes", "Confirmés", "Annulés"];
   final List<Widget> _scheduleWidgets = [
-    UpcomingScreen(), // Upcoming appointments
-    ConfirmedScreen(), // Condirmed appointments
-    CanceledScreen(), // Canceled appointments
+    UpcomingScreen(), // Rendez-vous à venir
+    ConfirmedScreen(), // Rendez-vous confirmés
+    CanceledScreen(), // Rendez-vous annulés
   ];
 
   @override
@@ -27,7 +28,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
       backgroundColor: Color.fromARGB(255, 224, 221, 221),
       appBar: AppBar(
         title: Text(
-          "Schedule",
+          "Agenda",
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         automaticallyImplyLeading: false, // Supprime l'icône de retour
@@ -40,7 +41,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Tabs for selecting appointment type
+            // Onglets pour sélectionner le type de rendez-vous
             Container(
               decoration: BoxDecoration(
                 color: Color(0xFFF4F6FA),
@@ -65,7 +66,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                           borderRadius: BorderRadius.circular(10),
                           color:
                               _buttonIndex == index
-                                  ? Colors.blueAccent
+                                  ? Color(MyColors.color2) //Colors.blueAccent
                                   : Colors.transparent,
                           boxShadow:
                               _buttonIndex == index
@@ -98,7 +99,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Appointment List Section
+            // Section de la liste des rendez-vous
             Expanded(
               child: AnimatedSwitcher(
                 duration: Duration(milliseconds: 400),

@@ -1,3 +1,4 @@
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:e_health_front/screens/appointment/bookAppointment.dart';
 import 'package:e_health_front/screens/doctor/doctorProfilScreen.dart';
@@ -6,13 +7,12 @@ import 'package:e_health_front/services/api_service.dart';
 class DoctorsBySpecialityScreen extends StatefulWidget {
   final String specialityName;
 
-  const DoctorsBySpecialityScreen({
-    Key? key,
-    required this.specialityName,
-  }) : super(key: key);
+  const DoctorsBySpecialityScreen({Key? key, required this.specialityName})
+    : super(key: key);
 
   @override
-  State<DoctorsBySpecialityScreen> createState() => _DoctorsBySpecialityScreenState();
+  State<DoctorsBySpecialityScreen> createState() =>
+      _DoctorsBySpecialityScreenState();
 }
 
 class _DoctorsBySpecialityScreenState extends State<DoctorsBySpecialityScreen> {
@@ -43,9 +43,8 @@ class _DoctorsBySpecialityScreenState extends State<DoctorsBySpecialityScreen> {
       });
 
       final ApiService apiService = ApiService();
-      final List<Map<String, dynamic>> result = await apiService.getDoctorsBySpeciality(
-        specialityName: widget.specialityName,
-      );
+      final List<Map<String, dynamic>> result = await apiService
+          .getDoctorsBySpeciality(specialityName: widget.specialityName);
 
       setState(() {
         doctors = result;
@@ -54,7 +53,8 @@ class _DoctorsBySpecialityScreenState extends State<DoctorsBySpecialityScreen> {
       });
     } catch (e) {
       setState(() {
-        errorMessage = 'Erreur lors du chargement des médecins: ${e.toString()}';
+        errorMessage =
+            'Erreur lors du chargement des médecins: ${e.toString()}';
         isLoading = false;
       });
     }
@@ -68,11 +68,16 @@ class _DoctorsBySpecialityScreenState extends State<DoctorsBySpecialityScreen> {
     } else {
       final query = _searchController.text.toLowerCase();
       setState(() {
-        filteredDoctors = doctors.where((doctor) {
-          final String fullName = '${doctor['firstName']} ${doctor['lastName']}'.toLowerCase();
-          return fullName.contains(query) || 
-                (doctor['address'] != null && doctor['address'].toString().toLowerCase().contains(query));
-        }).toList();
+        filteredDoctors =
+            doctors.where((doctor) {
+              final String fullName =
+                  '${doctor['firstName']} ${doctor['lastName']}'.toLowerCase();
+              return fullName.contains(query) ||
+                  (doctor['address'] != null &&
+                      doctor['address'].toString().toLowerCase().contains(
+                        query,
+                      ));
+            }).toList();
       });
     }
   }
@@ -127,32 +132,33 @@ class _DoctorsBySpecialityScreenState extends State<DoctorsBySpecialityScreen> {
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : errorMessage.isNotEmpty
+              child:
+                  isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : errorMessage.isNotEmpty
                       ? Center(child: Text(errorMessage))
                       : filteredDoctors.isEmpty
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.search_off,
-                                    size: 60,
-                                    color: Colors.grey,
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    'Aucun ${widget.specialityName} trouvé',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ],
+                      ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.search_off,
+                              size: 60,
+                              color: Colors.grey,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Aucun ${widget.specialityName} trouvé',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
                               ),
-                            )
-                          : DoctorGrid(doctors: filteredDoctors),
+                            ),
+                          ],
+                        ),
+                      )
+                      : DoctorGrid(doctors: filteredDoctors),
             ),
           ],
         ),
@@ -184,7 +190,8 @@ class DoctorGrid extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => DoctorProfilScreen(doctor: doctors[index]),
+                builder:
+                    (context) => DoctorProfilScreen(doctor: doctors[index]),
               ),
             );
           },
@@ -249,7 +256,7 @@ class DoctorCard extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
+                backgroundColor: Color(MyColors.color2) /*Colors.blueAccent*/,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
