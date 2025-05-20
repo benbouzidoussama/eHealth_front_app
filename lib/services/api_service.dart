@@ -6,8 +6,8 @@ import 'dart:io';
 import 'chat_service.dart'; // Make sure to import the ChatService
 
 class ApiService {
-  final String baseUrl = "http://10.0.2.2:3000/api";
-  //final String baseUrl = "http://localhost:3000/api";
+  //final String baseUrl = "http://10.0.2.2:3000/api";
+  final String baseUrl = "http://localhost:3000/api";
 
   String? token;
   final ChatService _chatService = ChatService(); // Create ChatService instance
@@ -282,9 +282,9 @@ class ApiService {
     final url = Uri.parse('$baseUrl/notifications');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     token = prefs.getString('token') ?? token;
-    if (token == null) {
-      throw Exception("Token non défini");
-    }
+    // if (token == null) {
+    //   throw Exception("Token non défini");
+    // }
 
     final response = await http.get(
       url,
@@ -559,9 +559,17 @@ class ApiService {
     String status,
   ) async {
     final String url = '$baseUrl/appointments/$appointmentId/update';
+    await loadToken(); // Charger le token
+
+    if (token == null) {
+      throw Exception("Token non défini");
+    }
     final response = await http.put(
       Uri.parse(url),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
       body: jsonEncode({"status": status}),
     );
     if (response.statusCode != 200) {
@@ -842,6 +850,7 @@ class ApiService {
       return false;
     }
   }
+
   Future<String> sendMessageChatbot(String message) async {
     try {
       final response = await http.post(
@@ -849,7 +858,7 @@ class ApiService {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'query': message}),
       );
-      
+
       if (response.statusCode == 200) {
         return response.body;
       } else {

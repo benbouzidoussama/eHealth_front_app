@@ -145,52 +145,139 @@ class ProfilScreen extends StatelessWidget {
                       // Afficher la boîte de dialogue de confirmation
                       showDialog(
                         context: context,
-                        builder:
-                            (context) => AlertDialog(
-                              title: const Text('Déconnexion'),
-                              content: const Text(
-                                'Êtes-vous sûr de vouloir vous déconnecter ?',
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('Annuler'),
+                        builder: (BuildContext context) {
+                          return StatefulBuilder(
+                            builder: (
+                              BuildContext context,
+                              StateSetter setState,
+                            ) {
+                              return AlertDialog(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
-                                TextButton(
-                                  onPressed: () async {
-                                    // Appel de la fonction logout du ApiService
-                                    final apiService = ApiService();
-                                    await apiService.logout();
-                                    // Fermer le dialogue
-                                    Navigator.of(context).pop();
-                                    // Réinitialiser le provider UserProvider
-                                    // et ArticleProvider
-                                    Provider.of<UserProvider>(
-                                      context,
-                                      listen: false,
-                                    ).clearUser();
-                                    Provider.of<ArticleProvider>(
-                                      context,
-                                      listen: false,
-                                    ).clearArticles();
-
-                                    // Rediriger vers l'écran de connexion et effacer l'historique de navigation
-                                    Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) =>
-                                                LoginScreen(), // Remplacez par votre écran de connexion
+                                backgroundColor: Colors.white,
+                                title: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.logout_rounded,
+                                      color: Color(MyColors.color2),
+                                      size: 28,
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      "Déconnexion",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
                                       ),
-                                      (route) =>
-                                          false, // Ceci supprime toutes les routes précédentes
-                                    );
-                                  },
-                                  child: const Text('Déconnexion'),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'Êtes-vous sûr de vouloir vous déconnecter ?',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20),
+                                  ],
+                                ),
+                                actions: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      TextButton(
+                                        style: TextButton.styleFrom(
+                                          backgroundColor: Colors.grey[300],
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 20,
+                                            vertical: 10,
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text(
+                                          "Annuler",
+                                          style: TextStyle(
+                                            color: Colors.black87,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 15),
+                                      TextButton(
+                                        style: TextButton.styleFrom(
+                                          backgroundColor: Color(
+                                            MyColors.color2,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 20,
+                                            vertical: 10,
+                                          ),
+                                        ),
+                                        onPressed: () async {
+                                          // Appel de la fonction logout du ApiService
+                                          final apiService = ApiService();
+                                          await apiService.logout();
+                                          // Fermer le dialogue
+                                          Navigator.of(context).pop();
+                                          // Réinitialiser le provider UserProvider
+                                          // et ArticleProvider
+                                          Provider.of<UserProvider>(
+                                            context,
+                                            listen: false,
+                                          ).clearUser();
+                                          Provider.of<ArticleProvider>(
+                                            context,
+                                            listen: false,
+                                          ).clearArticles();
+
+                                          // Rediriger vers l'écran de connexion et effacer l'historique de navigation
+                                          Navigator.of(
+                                            context,
+                                          ).pushAndRemoveUntil(
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) => LoginScreen(),
+                                            ),
+                                            (route) =>
+                                                false, // Supprime toutes les routes précédentes
+                                          );
+                                        },
+                                        child: Text(
+                                          "Déconnexion",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
                       );
                     },
                   ),

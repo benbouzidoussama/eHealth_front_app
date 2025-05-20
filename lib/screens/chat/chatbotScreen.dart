@@ -34,7 +34,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   final Color _primaryColor = const Color(
     0xFF1E88E5,
   ); // Bleu pour le thème médical
-  final Color _accentColor = const Color(0xFF42A5F5);
+  //final Color _accentColor = const Color(0xFF42A5F5);
   final Color _userBubbleColor = const Color(0xFFE3F2FD);
   final Color _botBubbleColor = const Color(0xFFFFFFFF);
   final Color _backgroundColor = const Color(0xFFF5F7FA);

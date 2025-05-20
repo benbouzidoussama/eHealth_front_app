@@ -33,7 +33,6 @@ class _LoginScreenState extends State<LoginScreen> {
       _errorMessage = null;
     });
 
-    print("clique sue se connecter");
     final loginData = {
       "email": _emailController.text,
       "password": _passwordController.text,

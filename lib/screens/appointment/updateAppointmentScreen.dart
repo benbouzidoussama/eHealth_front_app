@@ -404,7 +404,7 @@ class _UpdateAppointmentScreenState extends State<UpdateAppointmentScreen> {
           child: const Icon(Icons.keyboard_arrow_left, color: Colors.black),
         ),
         title: const Text(
-          'Book Appointment',
+          'Modifier le rendez-vous',
           style: TextStyle(
             color: Colors.black,
             fontSize: 20,

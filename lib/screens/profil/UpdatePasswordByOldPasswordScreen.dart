@@ -71,7 +71,15 @@ class _UpdatePasswordByOldPasswordScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Changer mot de passe')),
+      backgroundColor: Color.fromARGB(255, 224, 221, 221),
+      appBar: AppBar(
+        leading: InkWell(
+          onTap: () => Navigator.pop(context),
+          child: const Icon(Icons.keyboard_arrow_left, color: Colors.black),
+        ),
+        title: const Text('Changer mot de passe'),
+        backgroundColor: Color.fromARGB(255, 224, 221, 221),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(

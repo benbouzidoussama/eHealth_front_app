@@ -132,9 +132,9 @@ class _UpdateProfilScreenState extends State<UpdateProfilScreen> {
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+        leading: InkWell(
+          onTap: () => Navigator.pop(context),
+          child: const Icon(Icons.keyboard_arrow_left, color: Colors.black),
         ),
       ),
       body: SingleChildScrollView(

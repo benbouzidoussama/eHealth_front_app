@@ -440,17 +440,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     final response = await _apiService.registerUser(userData);
     final data = jsonDecode(response.body);
+    final errorMessage = data['message'] ?? 'Erreur inconnue';
     if (response.statusCode == 200 ||
-        data['message'] == "refreshToken is not defined") {
+        data['message'] == "refreshToken is not defined" ||
+        errorMessage == 'Erreur inconnue') {
       print("Inscription réussie: ${data['message']}");
-      _showSuccessDialog("Inscription réussie");
+      _showSuccessDialog("Inscription réussie",Icons.check_circle,Colors.green);
+    } else if (errorMessage == 'User already exists') {
+      _showSuccessDialog("Cet utilisateur existe déjà",Icons.error,Colors.red);
     } else {
       final errorData = jsonDecode(response.body);
       String errorMessage = errorData['message'] ?? 'Erreur inconnue';
       print("Erreur: $errorMessage");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(errorMessage)));
+      
+        _showSuccessDialog("Erreur lors de l'inscription",Icons.error,Colors.red);
+      
     }
   }
 
@@ -461,7 +465,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  void _showSuccessDialog(String message) {
+  void _showSuccessDialog(String message,IconData icon,Color color) {
     showDialog(
       context: context,
       barrierDismissible:
@@ -471,12 +475,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               // Icône animée
-              Icon(Icons.check_circle, color: Colors.green, size: 80),
+              Icon(icon,
+                size:80,
+                color: color,
+              ),
               const SizedBox(height: 20),
               // Message de succès
               Text(
@@ -494,7 +501,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             Center(
               child: TextButton(
                 style: TextButton.styleFrom(
-                  backgroundColor: Color(MyColors.color1) /*Color(0xFF4880D8)*/,
+                  backgroundColor: Color(MyColors.color2) /*Color(0xFF4880D8)*/,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),

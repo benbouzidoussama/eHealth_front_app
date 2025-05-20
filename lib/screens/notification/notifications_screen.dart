@@ -1,4 +1,5 @@
 // ignore_for_file: use_key_in_widget_constructors
+import 'package:e_health_front/screens/appointment/appointmentScreen.dart';
 import 'package:e_health_front/screens/chat/chatDetailScreen.dart';
 import 'package:e_health_front/services/chat_service.dart';
 import 'package:flutter/material.dart';
@@ -100,6 +101,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 224, 221, 221),
       appBar: AppBar(
+        leading: InkWell(
+          onTap: () => Navigator.pop(context),
+          child: const Icon(Icons.keyboard_arrow_left, color: Colors.black),
+        ),
         backgroundColor: const Color.fromARGB(255, 224, 221, 221),
         title: Text(
           'Notifications',
@@ -212,8 +217,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 ],
               ),
               trailing: Icon(
-                isRead ? Icons.check_circle : Icons.circle,
+                Icons.circle,
                 color: isRead ? Colors.green : Colors.red,
+                size: 10,
               ),
               onTap: () async {
                 // Handle notification tap based on type
@@ -244,9 +250,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     );
                   }
                 } else if (notification['type'] == 'appointment') {
-                  // Navigate to appointment details
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Navigation vers le rendez-vous')),
+                  //Navigate to appointment details
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AppointmentScreen(),
+                    ),
                   );
                 }
               },

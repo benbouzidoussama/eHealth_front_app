@@ -64,11 +64,11 @@ class _NavigationState extends State<Navigation> {
             tabBackgroundColor: Colors.blueAccent.withOpacity(0.1),
             padding: const EdgeInsets.all(16),
             tabs: const [
-              GButton(icon: Icons.home, text: 'Home'),
-              GButton(icon: Icons.health_and_safety_sharp, text: 'Doctor'),
-              GButton(icon: Icons.message, text: 'Chat'),
-              GButton(icon: Icons.calendar_month, text: 'Appt'),
-              GButton(icon: Icons.person, text: 'Profile'),
+              GButton(icon: Icons.home, text: 'Accueil'),
+              GButton(icon: Icons.health_and_safety_sharp, text: 'Médecin'),
+              GButton(icon: Icons.message, text: 'Msg'),
+              GButton(icon: Icons.calendar_month, text: 'RDV'),
+              GButton(icon: Icons.person, text: 'Profil'),
             ],
             selectedIndex: currentIndexTab,
             onTabChange: (index) {

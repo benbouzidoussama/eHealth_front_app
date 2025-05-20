@@ -4,7 +4,7 @@ import '../screens/styles/colors.dart'; // Importez les couleurs si nécessaire
 
 class SpecialitiesList extends StatelessWidget {
   const SpecialitiesList({Key? key}) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -14,16 +14,21 @@ class SpecialitiesList extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemCount: specialities.length,
         itemBuilder: (context, index) {
-          return SpecialityCard(speciality: specialities[index], onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder:
-                (context) =>
-                    DoctorsBySpecialityScreen(specialityName: specialities[index].name),
-          ),
-        );
-      },);
+          return SpecialityCard(
+            speciality: specialities[index],
+            onTap: () {
+              debugPrint("Speciality tapped: ${specialities[index].name}");
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (context) => DoctorsBySpecialityScreen(
+                        specialityName: specialities[index].name,
+                      ),
+                ),
+              );
+            },
+          );
         },
       ),
     );

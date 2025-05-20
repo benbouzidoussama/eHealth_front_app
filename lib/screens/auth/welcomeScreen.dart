@@ -12,7 +12,6 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _animation;
 
   @override
   void initState() {
@@ -21,7 +20,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       duration: const Duration(seconds: 2),
       vsync: this,
     );
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+
     _controller.forward();
   }
 
@@ -104,53 +103,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // App icon or illustration
-                        // FadeTransition(
-                        //   opacity: _animation,
-                        //   child: Container(
-                        //     width: 150,
-                        //     height: 150,
-                        //     decoration: BoxDecoration(
-                        //       color: Colors.white,
-                        //       shape: BoxShape.circle,
-                        //       boxShadow: [
-                        //         BoxShadow(
-                        //           color: Colors.black12,
-                        //           blurRadius: 15,
-                        //           spreadRadius: 5,
-                        //         ),
-                        //       ],
-                        //     ),
-                        //     child: Image.asset(
-                        //       'assets/images/logo.jpeg',
-                        //       fit: BoxFit.cover,
-                        //     ),
-                        //   ),
-                        // ),
-                        // Or use a network image
-                        // Container(
-                        //   width: 150,
-                        //   height: 150,
-                        //   // decoration: BoxDecoration(
-                        //   //   color: Colors.transparent,
-                        //   //   shape: BoxShape.circle,
-                        //   // ),
-                        //   child: ClipOval(
-                        //     child: Image.asset(
-                        //       'images/logo5.png',
-                        //       //fit: BoxFit.cover,
-                        //     ),
-                        //   ),
-                        // ),
-                        // ClipOval(
-                        //   child: Padding(
-                        //     padding: const EdgeInsets.all(15),
-                        //     child: Image.asset(
-                        //       'images/logo5.png',
-                        //       fit: BoxFit.cover,
-                        //     ),
-                        //   ),
-                        // ),
                         Image.asset(
                           'images/logo5.png',
                           width: 150,
@@ -220,14 +172,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     ),
                   ),
                 ),
-                // Footer text
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Text(
-                    "© 2025 E-Health",
-                    style: TextStyle(color: Colors.white70, fontSize: 12),
-                  ),
-                ),
+                // // Footer text
+                // Padding(
+                //   padding: const EdgeInsets.only(bottom: 20.0),
+                //   child: Text(
+                //     "© 2025 E-Health",
+                //     style: TextStyle(color: Colors.white70, fontSize: 12),
+                //   ),
+                // ),
               ],
             ),
           ),

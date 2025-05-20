@@ -310,7 +310,7 @@ class AppointmentCard extends StatelessWidget {
           width: double.infinity,
           height: 10,
           decoration: BoxDecoration(
-            color: Color(0xffc3c5f8),
+            color: Color(MyColors.color2).withOpacity(0.5),
             borderRadius: BorderRadius.only(
               bottomRight: Radius.circular(10),
               bottomLeft: Radius.circular(10),
@@ -492,7 +492,9 @@ class ArticlesList extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10),
                           child: Text(
-                            articles[index]['titre'],
+                            articles[index]['titre'].length > 25
+                                ? '${articles[index]['titre'].substring(0, 25)}...'
+                                : articles[index]['titre'],
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,

@@ -16,7 +16,7 @@ class ArticleDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final articleProvider = Provider.of<ArticleProvider>(context);
     final article = articleProvider.getArticleById(articleId);
-    final theme = Theme.of(context);
+  //final theme = Theme.of(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -153,7 +153,9 @@ class ArticleDetailScreen extends StatelessWidget {
                             child: CircleAvatar(
                               backgroundImage:
                                   article['idDoctor']['image'] != null
-                                      ? NetworkImage(article['idDoctor']['image'])
+                                      ? NetworkImage(
+                                        article['idDoctor']['image'],
+                                      )
                                       : const AssetImage('images/avatar.jpg')
                                           as ImageProvider,
                               radius: 24,

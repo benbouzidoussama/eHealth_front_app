@@ -59,6 +59,7 @@ dependencies:
   flutter_background_service: ^5.0.8
   flutter_background_service_android: ^6.3.0
   permission_handler: ^12.0.0+1
+  flutter_launcher_icons: ^0.14.3
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -74,6 +75,11 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "images/logo7.png"  # Remplace par le chemin de ton image
+
 flutter:
 
   # The following line ensures that the Material Icons font is

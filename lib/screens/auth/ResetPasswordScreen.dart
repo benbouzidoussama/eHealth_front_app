@@ -22,16 +22,41 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
   String message = '';
+  String? passwordError;
+  
+  // Fonction pour valider le mot de passe
+  String? validatePassword(String password) {
+    if (password.isEmpty) {
+      return "Veuillez saisir un mot de passe";
+    } else if (password.length < 8) {
+      return "Le mot de passe doit contenir au moins 8 caractères";
+    }
+    return null;
+  }
 
   void resetPassword() async {
+    // Validation du mot de passe
+    final passwordValidation = validatePassword(passwordController.text);
+    if (passwordValidation != null) {
+      setState(() {
+        passwordError = passwordValidation;
+      });
+      return;
+    }
+    
+    // Vérification de la correspondance des mots de passe
     if (passwordController.text != confirmPasswordController.text) {
       setState(() {
         message = "Les mots de passe ne correspondent pas.";
+        passwordError = null;
       });
       return;
     }
 
-    setState(() => _isLoading = true);
+    setState(() {
+      passwordError = null;
+      _isLoading = true;
+    });
 
     final result = await _apiService.resetPassword(
       widget.token,
@@ -79,7 +104,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       ),
                       SizedBox(height: 10),
                       Text(
-                        'Veuillez entrer et confirmer votre nouveau mot de passe',
+                        'Veuillez entrer et confirmer votre nouveau mot de passe (minimum 8 caractères)',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 15,
@@ -94,6 +119,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         style: TextStyle(fontSize: 20),
                         decoration: InputDecoration(
                           hintText: "Nouveau mot de passe",
+                          errorText: passwordError,
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword
@@ -113,6 +139,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           fillColor: Color(0xfff3f3f4),
                           filled: true,
                         ),
+                        onChanged: (value) {
+                          // Valider à chaque changement pour donner un feedback immédiat
+                          setState(() {
+                            passwordError = validatePassword(value);
+                          });
+                        },
                       ),
                       SizedBox(height: 20),
 

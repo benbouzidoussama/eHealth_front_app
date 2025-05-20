@@ -28,12 +28,12 @@ class DoctorProfilScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+        leading: InkWell(
+          onTap: () => Navigator.pop(context),
+          child: const Icon(Icons.keyboard_arrow_left, color: Colors.black),
         ),
         title: const Text(
-            'Profil du Médecin',
+          'Profil du Médecin',
           style: TextStyle(
             color: Colors.black,
             fontSize: 22,

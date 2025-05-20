@@ -191,6 +191,7 @@ class RegimeScreen extends StatelessWidget {
                     spacing: 8,
                     runSpacing: 8,
                     children:
+                        // ignore: unnecessary_cast
                         (restrictions as List).map<Widget>((restriction) {
                           return Container(
                             padding: const EdgeInsets.symmetric(

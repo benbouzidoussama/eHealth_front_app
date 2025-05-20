@@ -98,9 +98,9 @@ class _DoctorsBySpecialityScreenState extends State<DoctorsBySpecialityScreen> {
           ),
         ),
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+        leading: InkWell(
+          onTap: () => Navigator.pop(context),
+          child: const Icon(Icons.keyboard_arrow_left, color: Colors.black),
         ),
       ),
       body: Padding(
@@ -228,8 +228,12 @@ class DoctorCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircleAvatar(
-              backgroundImage: AssetImage('images/profil.jpeg'),
+            CircleAvatar(
+              backgroundImage:
+                  doctor['image'] != null
+                      ? NetworkImage(doctor['image'])
+                      : const AssetImage('images/avatar.jpg') as ImageProvider,
+
               radius: 35,
             ),
             const SizedBox(height: 10),

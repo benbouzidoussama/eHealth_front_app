@@ -13,6 +13,20 @@ class ConfirmedScreen extends StatefulWidget {
 
 class _ConfirmedScreenState extends State<ConfirmedScreen> {
   final ApiService _apiService = ApiService();
+  late Future<List<Map<String, dynamic>>> _appointmentsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshAppointments();
+  }
+
+  // Méthode pour rafraîchir les rendez-vous
+  void _refreshAppointments() {
+    setState(() {
+      _appointmentsFuture = _fetchConfirmedAppointments();
+    });
+  }
 
   Future<List<Map<String, dynamic>>> _fetchConfirmedAppointments() async {
     try {
@@ -87,7 +101,7 @@ class _ConfirmedScreenState extends State<ConfirmedScreen> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 224, 221, 221),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _fetchConfirmedAppointments(),
+        future: _appointmentsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -249,42 +263,140 @@ class _ConfirmedScreenState extends State<ConfirmedScreen> {
                                     showDialog(
                                       context: context,
                                       builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text('Confirmation'),
-                                          content: const Text(
-                                            'Êtes-vous sûr de vouloir annuler ce rendez-vous?',
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(
-                                                  context,
-                                                ).pop(); // Fermer la boîte de dialogue
-                                              },
-                                              child: const Text('Non'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () async {
-                                                // Fermer la boîte de dialogue
-                                                Navigator.of(context).pop();
+                                        return StatefulBuilder(
+                                          builder: (
+                                            BuildContext context,
+                                            StateSetter setState,
+                                          ) {
+                                            return AlertDialog(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              ),
+                                              backgroundColor: Colors.white,
+                                              title: Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.warning_amber_rounded,
+                                                    color: Color(
+                                                      MyColors.color2,
+                                                    ),
+                                                    size: 28,
+                                                  ),
+                                                  SizedBox(width: 10),
+                                                  Text(
+                                                    "Confirmation",
+                                                    style: TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black87,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              content: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    'Êtes-vous sûr de vouloir annuler ce rendez-vous?',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors.black87,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 20),
+                                                ],
+                                              ),
+                                              actions: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    TextButton(
+                                                      style: TextButton.styleFrom(
+                                                        backgroundColor:
+                                                            Colors.grey[300],
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                10,
+                                                              ),
+                                                        ),
+                                                        padding:
+                                                            EdgeInsets.symmetric(
+                                                              horizontal: 20,
+                                                              vertical: 10,
+                                                            ),
+                                                      ),
+                                                      onPressed: () {
+                                                        Navigator.of(
+                                                          context,
+                                                        ).pop(); // Fermer la boîte de dialogue
+                                                      },
+                                                      child: Text(
+                                                        "Non",
+                                                        style: TextStyle(
+                                                          color: Colors.black87,
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 15),
+                                                    TextButton(
+                                                      style: TextButton.styleFrom(
+                                                        backgroundColor: Color(
+                                                          MyColors.color2,
+                                                        ),
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                10,
+                                                              ),
+                                                        ),
+                                                        padding:
+                                                            EdgeInsets.symmetric(
+                                                              horizontal: 20,
+                                                              vertical: 10,
+                                                            ),
+                                                      ),
+                                                      onPressed: () async {
+                                                        // Fermer la boîte de dialogue
+                                                        Navigator.of(
+                                                          context,
+                                                        ).pop();
 
-                                                // Appeler la fonction pour mettre à jour le statut
-                                                await _apiService
-                                                    .updateAppointmentStatus(
-                                                      appointment['_id'],
-                                                      "canceled",
-                                                    );
-                                                _showSuccessDialog(
-                                                  'Rendez-vous annulé avec succès',
-                                                );
-                                                // Rafraîchir la liste des rendez-vous
-                                                setState(() {
-                                                  // Cela va déclencher le FutureBuilder pour se rafraîchir
-                                                });
-                                              },
-                                              child: const Text('Oui'),
-                                            ),
-                                          ],
+                                                        // Appeler la fonction pour mettre à jour le statut
+                                                        await _apiService
+                                                            .updateAppointmentStatus(
+                                                              appointment['_id'],
+                                                              "canceled",
+                                                            );
+                                                        _showSuccessDialog(
+                                                          'Rendez-vous annulé avec succès',
+                                                        );
+
+                                                        // Rafraîchir la liste des rendez-vous
+                                                          _refreshAppointments();
+                                                      },
+                                                      child: Text(
+                                                        "Oui",
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            );
+                                          },
                                         );
                                       },
                                     );
@@ -327,7 +439,7 @@ class _ConfirmedScreenState extends State<ConfirmedScreen> {
                                       if (value == 'refresh') {
                                         setState(() {
                                           // pour mettre à jour l'affichage
-                                          _fetchConfirmedAppointments();
+                                          _refreshAppointments();
                                         });
                                       }
                                     });

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
+//import 'dart:math';
 import 'package:e_health_front/services/api_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -12,10 +12,10 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class ChatService {
-  //final String baseUrl = "http://localhost:3000/api";
-  //final String socketUrl = "http://localhost:3000";
-  final String baseUrl = "http://10.0.2.2:3000/api";
-  final String socketUrl = "http://10.0.2.2:3000";
+  final String baseUrl = "http://localhost:3000/api";
+  final String socketUrl = "http://localhost:3000";
+  //final String baseUrl = "http://10.0.2.2:3000/api";
+  //final String socketUrl = "http://10.0.2.2:3000";
 
   IO.Socket? socket;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -281,7 +281,7 @@ class ChatService {
 
   Future<String?> getDoctorIdByChatId(String chatId) async {
   try {
-    final token = await getToken();
+    //final token = await getToken();
     final chats = await getChats();
 
     for (var chat in chats) {
