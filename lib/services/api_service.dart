@@ -7,7 +7,9 @@ import 'chat_service.dart'; // Make sure to import the ChatService
 
 class ApiService {
   //final String baseUrl = "http://10.0.2.2:3000/api";
-  final String baseUrl = "http://localhost:3000/api";
+  //final String baseUrl = "http://localhost:3000/api";
+  final String baseUrl = "https://e-health-1.onrender.com/api";
+
 
   String? token;
   final ChatService _chatService = ChatService(); // Create ChatService instance

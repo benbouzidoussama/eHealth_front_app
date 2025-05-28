@@ -293,7 +293,7 @@ class _HistoryAppointmentScreenState extends State<HistoryAppointmentScreen> {
           // Notes section
           if (appointment['notes'] != null && appointment['notes'].isNotEmpty)
             _buildSectionWithNavigation(
-              '📝 Notes',
+              'Notes',
               appointment['notes'],
               (notes) => NoteScreen(notes: notes),
               (note) => '${note['titre']}: ${note['content']}',
@@ -305,7 +305,7 @@ class _HistoryAppointmentScreenState extends State<HistoryAppointmentScreen> {
           if (appointment['prescriptions'] != null &&
               appointment['prescriptions'].isNotEmpty)
             _buildSectionWithNavigation(
-              '💊 Ordonnances',
+              'Ordonnances',
               appointment['prescriptions'],
               (prescriptions) => OrdonnanceScreen(prescriptions: prescriptions),
               (presc) => presc['description'],
@@ -317,7 +317,7 @@ class _HistoryAppointmentScreenState extends State<HistoryAppointmentScreen> {
           if (appointment['dietPlans'] != null &&
               appointment['dietPlans'].isNotEmpty)
             _buildSectionWithNavigation(
-              '🥗 Régimes',
+              'Régimes',
               appointment['dietPlans'],
               (dietPlans) => RegimeScreen(dietPlans: dietPlans),
               (diet) => '${diet['dietType']}: ${diet['description']}',
@@ -330,7 +330,7 @@ class _HistoryAppointmentScreenState extends State<HistoryAppointmentScreen> {
               appointment['documents'].isNotEmpty) ...[
             const SizedBox(height: 16),
             Text(
-              '📁 Documents',
+              'Documents',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,

@@ -100,6 +100,8 @@ flutter:
     - images/logo5.png
     - images/logo6.png
     - images/logo7.png
+    - images/logonoir.png
+    - images/logoblanc.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

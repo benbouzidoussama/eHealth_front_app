@@ -7,9 +7,9 @@ import 'dart:async';
 class MessageNotificationService {
   final FlutterLocalNotificationsPlugin notificationsPlugin =
       FlutterLocalNotificationsPlugin();
-  final String baseUrl =
-      "http://localhost:3000/api"; // Utilisez la même URL que votre ApiService
+  //final String baseUrl ="http://localhost:3000/api"; // Utilisez la même URL que votre ApiService
   //final String baseUrl = "https://10.0.2.2:3000/api"; // Remplacez par l'URL de votre API
+  final String baseUrl = "https://e-health-1.onrender.com/api"; // URL de l'API
   Timer? messageCheckTimer;
 
   // Initialiser les notifications

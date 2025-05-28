@@ -45,7 +45,8 @@ class RegimeScreen extends StatelessWidget {
   Widget _buildDietCard(Map<String, dynamic> diet, int index) {
     final dietType = diet['dietType'] ?? 'Sans type';
     final description = diet['description'] ?? 'Pas de description';
-    final duration = diet['duration'] ?? 'Non spécifié';
+    final duration =
+        diet['createdAt'].toString().split('T')[0] ?? 'Non spécifié';
     final restrictions = diet['restrictions'] ?? [];
 
     // Different pastel colors for different cards

@@ -68,34 +68,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           SafeArea(
             child: Column(
               children: [
-                // Custom AppBar
-                // Padding(
-                //   padding: const EdgeInsets.symmetric(
-                //     horizontal: 16.0,
-                //     vertical: 20.0,
-                //   ),
-                //   child: Row(
-                //     mainAxisAlignment: MainAxisAlignment.center,
-                //     children: [
-                //       Container(
-                //         padding: const EdgeInsets.all(10),
-                //         decoration: BoxDecoration(
-                //           color: Colors.white.withOpacity(0.2),
-                //           borderRadius: BorderRadius.circular(15),
-                //         ),
-                //         child: Text(
-                //           "Healora",
-                //           style: TextStyle(
-                //             fontSize: 30,
-                //             fontWeight: FontWeight.bold,
-                //             color: Colors.white,
-                //           ),
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-
+                
                 // Main content
                 Expanded(
                   child: Padding(
@@ -104,7 +77,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset(
-                          'images/logo5.png',
+                          'images/logo7.png',
                           width: 150,
                           height: 150,
                         ),
@@ -172,14 +145,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     ),
                   ),
                 ),
-                // // Footer text
-                // Padding(
-                //   padding: const EdgeInsets.only(bottom: 20.0),
-                //   child: Text(
-                //     "© 2025 E-Health",
-                //     style: TextStyle(color: Colors.white70, fontSize: 12),
-                //   ),
-                // ),
+                
               ],
             ),
           ),

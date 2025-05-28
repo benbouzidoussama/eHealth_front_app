@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:e_health_front/screens/auth/welcomeScreen.dart';
+import 'package:e_health_front/screens/styles/colors.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:e_health_front/screens/bottom_nav/navigation.dart';
@@ -162,29 +163,29 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             RichText(
               textAlign: TextAlign.center,
-              text: const TextSpan(
-                text: 'E',
+              text: TextSpan(
+                text: 'H',
                 style: TextStyle(
                   fontSize: 40,
                   fontWeight: FontWeight.w700,
-                  color: Colors.lightBlue,
+                  color: Color(MyColors.color2),
                 ),
                 children: [
                   TextSpan(
-                    text: '-H',
+                    text: 'ea',
                     style: TextStyle(color: Colors.black, fontSize: 40),
                   ),
                   TextSpan(
                     text: 'l',
-                    style: TextStyle(color: Colors.blue, fontSize: 40),
+                    style: TextStyle(color:Color(MyColors.color2), fontSize: 40),
                   ),
                   TextSpan(
-                    text: 'eat',
+                    text: 'or',
                     style: TextStyle(color: Colors.black, fontSize: 40),
                   ),
                   TextSpan(
-                    text: 'h',
-                    style: TextStyle(color: Colors.lightBlue, fontSize: 40),
+                    text: 'a',
+                    style: TextStyle(color: Color(MyColors.color2), fontSize: 40),
                   ),
                 ],
               ),

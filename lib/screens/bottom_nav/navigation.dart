@@ -21,14 +21,6 @@ class _NavigationState extends State<Navigation> {
   final List<Widget> pages = [
     HomeScreen(),
     DoctorScreen(),
-    // MultiProvider(
-    //   providers: [
-    //     ChangeNotifierProvider(create: (_) => DoctorProvider()),
-    //     ChangeNotifierProvider(create: (_) => UserProvider()),
-    //     // Add more providers if needed
-    //   ],
-    //   child: DoctorScreen(),
-    // ),
     ChatListScreen(),
     AppointmentScreen(),
     ProfilScreen(),

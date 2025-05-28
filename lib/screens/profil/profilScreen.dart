@@ -135,7 +135,7 @@ class ProfilScreen extends StatelessWidget {
                       );
                     },
                   ),
-                  _buildSettingsItem(Icons.info, 'À propos', context),
+                  
                   _buildSettingsItem(
                     Icons.logout,
                     'Déconnexion',

@@ -79,30 +79,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           height: 150,
                         ),
 
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Heal',
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.w800,
-                                color: Color(MyColors.color2),
-                                letterSpacing: 1.2,
-                              ),
-                            ),
-                            Text(
-                              'ora',
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.w600,
-                                color: Color(MyColors.color2),
-                                letterSpacing: 0.8,
-                              ),
-                            ),
-                            SizedBox(width: 5),
-                          ],
-                        ),
+                    
                         SizedBox(height: 20),
                         _buildTextField(
                           "Prénom",
